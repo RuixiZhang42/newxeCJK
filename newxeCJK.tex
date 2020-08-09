@@ -1,0 +1,1113 @@
+\makeatletter
+\ExplSyntaxOn
+
+\tl_new:N  \l_@@_CJKglue_tl
+\tl_set:Nn \l_@@_CJKglue_tl { 0em plus 0.0625em }
+
+\tl_new:N  \l_@@_CJKecglue_tl
+\tl_set:Nn \l_@@_CJKecglue_tl { 2em plus 1em minus 1em / 10 }
+
+\fp_new:N \l_@@_punct_width_ratio_fp
+\cs_new_protected:Npn \SetPunctWidthRatio #1
+  {
+    \fp_set:Nn \l_@@_punct_width_ratio_fp {#1}
+  }
+\SetPunctWidthRatio { 1 }
+
+\fp_new:N    \l_@@_end_sentence_punct_width_ratio_fp
+\clist_new:N \l_@@_end_sentence_punct_clist
+\cs_new_protected:Npn \SetEndSentencePunctWidthRatio #1
+  {
+    \fp_set:Nn \l_@@_end_sentence_punct_width_ratio_fp {#1}
+  }
+\SetEndSentencePunctWidthRatio { 1 }
+
+\fp_new:N \l_@@_punct_min_width_ratio_fp
+\fp_new:N \l_@@_punct_removable_width_ratio_fp
+\cs_new_protected:Npn \SetPunctMinWidthRatio #1
+  {
+    \fp_set:Nn \l_@@_punct_min_width_ratio_fp {#1}
+    \exp_args:NNx \fp_set:Nn
+      \l_@@_punct_removable_width_ratio_fp
+      { \fp_max:nn { 1 - #1 } \c_zero_fp }
+  }
+\SetPunctMinWidthRatio { 0.5 }
+
+\fp_new:N \l_@@_mid_punct_min_width_ratio_fp
+\fp_new:N \l_@@_mid_punct_removable_width_ratio_fp
+\cs_new_protected:Npn \SetMiddlePunctMinWidthRatio #1
+  {
+    \fp_set:Nn \l_@@_mid_punct_min_width_ratio_fp {#1}
+    \exp_args:NNx \fp_set:Nn
+      \l_@@_mid_punct_removable_width_ratio_fp
+      { \fp_max:nn { ( 1 - #1 ) / 2 } \c_zero_fp }
+  }
+\SetMiddlePunctMinWidthRatio { 0.5 }
+
+\fp_new:N \l_@@_punct_kern_width_ratio_fp
+\cs_new_protected:Npn \SetPunctKernWidthRatio #1
+  {
+    \exp_args:NNx \fp_set:Nn
+      \l_@@_punct_kern_width_ratio_fp
+      { \fp_abs:n {#1} }
+  }
+\SetPunctKernWidthRatio { -0.5 }
+
+\cs_new_protected:Npn \quanjiaostyle
+  {
+    \SetPunctWidthRatio { 1 }
+    \SetEndSentencePunctWidthRatio { 1 }
+    \SetPunctMinWidthRatio { 0.5 }
+    \SetMiddlePunctMinWidthRatio { 0.5 }
+    \SetPunctKernWidthRatio { 0.5 }
+  }
+\cs_new_protected:Npn \banjiaostyle
+  {
+    \SetPunctWidthRatio { 0.5 }
+    \SetEndSentencePunctWidthRatio { 0.5 }
+    \SetPunctMinWidthRatio { 0.5 }
+    \SetMiddlePunctMinWidthRatio { 0.5 }
+    \SetPunctKernWidthRatio { 0.5 }
+  }
+\cs_new_protected:Npn \kaimingstyle
+  {
+    \SetPunctWidthRatio { 0.5 }
+    \SetEndSentencePunctWidthRatio { 1 }
+    \SetPunctMinWidthRatio { 0.5 }
+    \SetMiddlePunctMinWidthRatio { 0.5 }
+    \SetPunctKernWidthRatio { 0.5 }
+  }
+\cs_new_protected:Npn \plainstyle
+  {
+    \SetPunctWidthRatio { 1 }
+    \SetEndSentencePunctWidthRatio { 1 }
+    \SetPunctMinWidthRatio { 1 }
+    \SetMiddlePunctMinWidthRatio { 1 }
+    \SetPunctKernWidthRatio { 0 }
+  }
+
+\bool_new:N       \l_@@_enable_hanging_punct_bool
+\bool_set_false:N \l_@@_enable_hanging_punct_bool
+%\bool_set_true:N  \l_@@_enable_hanging_punct_bool
+\clist_new:N      \l_@@_hangable_punct_clist
+
+\clist_new:N \l_@@_keep_blank_punct_clist
+
+\XeTeXinterchartokenstate = \c_one_int
+
+\newXeTeXintercharclass \g_@@_CJK_class
+\newXeTeXintercharclass \g_@@_Closing_LeftHalf_class
+\newXeTeXintercharclass \g_@@_Closing_MiddleHalf_class
+\newXeTeXintercharclass \g_@@_Closing_Full_class
+\newXeTeXintercharclass \g_@@_Opening_RightHalf_class
+\newXeTeXintercharclass \g_@@_Opening_Full_class
+
+\cs_new_protected:Npn \@@_nobreak:
+  { \tex_penalty:D 10 000 ~ }
+
+\cs_new_protected:Npn \@@_allowbreak:
+  { \tex_penalty:D 0 ~ }
+
+\cs_new_protected:Npn \@@_insert_CJKglue:
+  { \skip_horizontal:n { \l_@@_CJKglue_tl } }
+
+\cs_new_protected:Npn \@@_insert_nobreak_CJKglue:
+  { \@@_nobreak: \skip_horizontal:n { \l_@@_CJKglue_tl } }
+
+\cs_new_protected:Npn \@@_insert_CJKecglue:
+  { \skip_horizontal:n { \l_@@_CJKecglue_tl } }
+
+\cs_new_protected:Npn \@@_remove_blank:n #1
+  {
+    \tex_vrule:D
+      height \c_zero_dim
+      depth  \c_zero_dim
+      width  - #1
+  }
+
+\cs_new_protected:Npn \@@_add_shrinkable_glue:n #1
+  { \skip_horizontal:n { #1 minus #1 } }
+
+\bool_new:N \l_@@_keep_current_punct_blank_bool
+\bool_new:N \l_@@_hang_current_punct_bool
+\fp_new:N   \l_@@_current_punct_width_ratio_fp
+
+\cs_new_protected:Npn \@@_preprocess_closing_punct:nN #1#2
+  {
+    \bool_set_false:N \l_@@_keep_current_punct_blank_bool
+    \@@_if_in_setup:Nnn
+      \l_@@_keep_blank_punct_clist
+      { `#2 }
+      { \bool_set_true:N \l_@@_keep_current_punct_blank_bool }
+    \bool_set_false:N \l_@@_hang_current_punct_bool
+    \bool_if:NT \l_@@_enable_hanging_punct_bool
+      {
+        \@@_if_in_setup:Nnn
+          \l_@@_hangable_punct_clist
+          { `#2 }
+          { \bool_set_true:N \l_@@_hang_current_punct_bool }
+      }
+    \fp_compare:nNnT
+        \l_@@_current_punct_width_ratio_fp
+      < \l_@@_end_sentence_punct_width_ratio_fp
+      {
+        \@@_if_in_setup:Nnn
+          \l_@@_end_sentence_punct_clist
+          { `#2 }
+          \@@_set_current_punct_width_ratio_end:
+      }
+    #1
+    #2
+  }
+
+\cs_new_protected:Npn \@@_if_in_setup:Nnn #1#2#3
+  {
+    \clist_map_inline:Nn #1
+      {
+        \int_compare:nNnT {##1} = {#2}
+          { \clist_map_break:n {#3} }
+      }
+  }
+
+\cs_new_protected:Npn \@@_set_current_punct_width_ratio:
+  {
+    \fp_set_eq:NN \l_@@_current_punct_width_ratio_fp
+      \l_@@_punct_width_ratio_fp
+  }
+
+\cs_new_protected:Npn \@@_set_current_punct_width_ratio_end:
+  {
+    \fp_set_eq:NN \l_@@_current_punct_width_ratio_fp
+      \l_@@_end_sentence_punct_width_ratio_fp
+  }
+
+% CJK 与 CJK
+
+\XeTeXinterchartoks \g_@@_CJK_class \g_@@_CJK_class
+  { \@@_insert_CJKglue: }
+
+% CJK 与 closing
+
+\XeTeXinterchartoks \g_@@_CJK_class \g_@@_Closing_LeftHalf_class
+  {
+    \@@_insert_nobreak_CJKglue:
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN { }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_CJK_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \bool_if:NT \l_@@_hang_current_punct_bool
+      {
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
+        \skip_horizontal:n
+          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
+        \bool_if:NF \l_@@_keep_current_punct_blank_bool
+          { \@@_allowbreak: }
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_nobreak: }
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+              \l_@@_current_punct_width_ratio_fp
+            - \l_@@_punct_min_width_ratio_fp
+          }
+          \c_zero_fp em
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_allowbreak: }
+    \@@_insert_CJKglue:
+  }
+
+\XeTeXinterchartoks \g_@@_CJK_class \g_@@_Closing_MiddleHalf_class
+  {
+    \@@_insert_nobreak_CJKglue:
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN
+      {
+%        \@@_nobreak:
+        \exp_args:Nx \@@_add_shrinkable_glue:n
+          {
+            \fp_max:nn
+              {
+                ( \l_@@_current_punct_width_ratio_fp
+                - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+              }
+              \c_zero_fp em
+          }
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+      }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_MiddleHalf_class \g_@@_CJK_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_nobreak: }
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+            ( \l_@@_current_punct_width_ratio_fp
+            - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+          }
+          \c_zero_fp em
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_allowbreak: }
+    \@@_insert_CJKglue:
+  }
+
+\XeTeXinterchartoks \g_@@_CJK_class \g_@@_Closing_Full_class
+  { \@@_insert_nobreak_CJKglue: }
+
+\XeTeXinterchartoks \g_@@_Closing_Full_class \g_@@_CJK_class
+  { \@@_insert_CJKglue: }
+
+% CJK 与 opening
+
+\XeTeXinterchartoks \g_@@_CJK_class \g_@@_Opening_RightHalf_class
+  {
+    \@@_insert_CJKglue:
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+              \l_@@_punct_width_ratio_fp
+            - \l_@@_punct_min_width_ratio_fp
+          }
+          \c_zero_fp em
+      }
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_CJK_class
+  { \@@_insert_nobreak_CJKglue: }
+
+\XeTeXinterchartoks \g_@@_CJK_class \g_@@_Opening_Full_class
+  { \@@_insert_CJKglue: }
+
+\XeTeXinterchartoks \g_@@_Opening_Full_class \g_@@_CJK_class
+  { \@@_insert_nobreak_CJKglue: }
+
+% closing 到 opening
+
+\XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_Opening_RightHalf_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \bool_if:NT \l_@@_hang_current_punct_bool
+      {
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
+        \skip_horizontal:n
+          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
+        \bool_if:NF \l_@@_keep_current_punct_blank_bool
+          { \@@_allowbreak: }
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_nobreak: }
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+              \l_@@_current_punct_width_ratio_fp
+            - \l_@@_punct_min_width_ratio_fp
+          }
+          \c_zero_fp em
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_allowbreak: }
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_MiddleHalf_class \g_@@_Opening_RightHalf_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_nobreak: }
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+            ( \l_@@_current_punct_width_ratio_fp
+            - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+          }
+          \c_zero_fp em
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_allowbreak: }
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_Full_class \g_@@_Opening_RightHalf_class
+  {
+    \@@_allowbreak:
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_Opening_Full_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \bool_if:NT \l_@@_hang_current_punct_bool
+      {
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
+        \skip_horizontal:n
+          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
+        \bool_if:NF \l_@@_keep_current_punct_blank_bool
+          { \@@_allowbreak: }
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_nobreak: }
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+              \l_@@_current_punct_width_ratio_fp
+            - \l_@@_punct_min_width_ratio_fp
+          }
+          \c_zero_fp em
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_allowbreak: }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_MiddleHalf_class \g_@@_Opening_Full_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_nobreak: }
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+            ( \l_@@_current_punct_width_ratio_fp
+            - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+          }
+          \c_zero_fp em
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_allowbreak: }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_Full_class \g_@@_Opening_Full_class
+  { \@@_allowbreak: }
+
+% opening 到 opening
+
+\XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_Opening_RightHalf_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_kern_width_ratio_fp em }
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_Full_class \g_@@_Opening_RightHalf_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_Opening_Full_class
+  { }
+
+\XeTeXinterchartoks \g_@@_Opening_Full_class \g_@@_Opening_Full_class
+  { }
+
+% closing 到 closing
+
+\XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_Closing_LeftHalf_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_kern_width_ratio_fp em }
+    \@@_preprocess_closing_punct:nN { }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_MiddleHalf_class \g_@@_Closing_LeftHalf_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+    \@@_nobreak:
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+            ( \l_@@_current_punct_width_ratio_fp
+            - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+          }
+          \c_zero_fp em
+      }
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN { }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_Full_class \g_@@_Closing_LeftHalf_class
+  {
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN { }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_Closing_MiddleHalf_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_nobreak:
+        \exp_args:Nx \@@_add_shrinkable_glue:n
+          {
+            \fp_max:nn
+              {
+                ( \l_@@_current_punct_width_ratio_fp
+                - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+              }
+              \c_zero_fp em
+          }
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+      }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_MiddleHalf_class \g_@@_Closing_MiddleHalf_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_nobreak:
+        \exp_args:Nx \@@_add_shrinkable_glue:n
+          {
+            \fp_max:nn
+              {
+                ( \l_@@_current_punct_width_ratio_fp
+                - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+              }
+              \c_zero_fp em
+          }
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+      }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_Full_class \g_@@_Closing_MiddleHalf_class
+  {
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_nobreak:
+        \exp_args:Nx \@@_add_shrinkable_glue:n
+          {
+            \fp_max:nn
+              {
+                ( \l_@@_current_punct_width_ratio_fp
+                - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+              }
+              \c_zero_fp em
+          }
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+      }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_Closing_Full_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_MiddleHalf_class \g_@@_Closing_Full_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+    \@@_nobreak:
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+            ( \l_@@_current_punct_width_ratio_fp
+            - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+          }
+          \c_zero_fp em
+      }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_Full_class \g_@@_Closing_Full_class
+  { }
+
+% opening 到 closing
+
+\XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_Closing_LeftHalf_class
+  {
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN { }
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_Full_class \g_@@_Closing_LeftHalf_class
+  {
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN { }
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_Closing_MiddleHalf_class
+  {
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_nobreak:
+        \exp_args:Nx \@@_add_shrinkable_glue:n
+          {
+            \fp_max:nn
+              {
+                ( \l_@@_current_punct_width_ratio_fp
+                - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+              }
+              \c_zero_fp em
+          }
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+      }
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_Full_class \g_@@_Closing_MiddleHalf_class
+  {
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_nobreak:
+        \exp_args:Nx \@@_add_shrinkable_glue:n
+          {
+            \fp_max:nn
+              {
+                ( \l_@@_current_punct_width_ratio_fp
+                - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+              }
+              \c_zero_fp em
+          }
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+      }
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_Closing_Full_class
+  { }
+
+\XeTeXinterchartoks \g_@@_Opening_Full_class \g_@@_Closing_Full_class
+  { }
+
+% 消除 boundary 到 CJK 插入的 tokens
+
+\cs_new_protected:Npn \@@_clear_Boundary_to_CJK_interchartoks:
+  {
+    \clist_map_inline:nn
+      {
+        \g_@@_CJK_class ,
+        \g_@@_Closing_LeftHalf_class ,
+        \g_@@_Closing_MiddleHalf_class ,
+        \g_@@_Closing_Full_class ,
+        \g_@@_Opening_RightHalf_class ,
+        \g_@@_Opening_Full_class
+      }
+      {
+        \tex_XeTeXinterchartoks:D
+          \e@alloc@intercharclass@top ##1 { }
+      }
+  }
+
+% class 0
+
+\XeTeXinterchartoks \c_zero_int \g_@@_CJK_class
+  {
+    \@@_insert_CJKecglue:
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+  }
+
+\XeTeXinterchartoks \g_@@_CJK_class \c_zero_int
+  {
+    \c_group_end_token
+    \@@_insert_CJKecglue:
+  }
+
+\XeTeXinterchartoks \c_zero_int \g_@@_Closing_LeftHalf_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN { }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \c_zero_int
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \bool_if:NT \l_@@_hang_current_punct_bool
+      {
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
+        \skip_horizontal:n
+          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
+        \bool_if:NF \l_@@_keep_current_punct_blank_bool
+          { \@@_allowbreak: }
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_nobreak: }
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+              \l_@@_current_punct_width_ratio_fp
+            - \l_@@_punct_min_width_ratio_fp
+          }
+          \c_zero_fp em
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_allowbreak: }
+    \c_group_end_token
+    \skip_horizontal:N \c_zero_skip
+  }
+
+\XeTeXinterchartoks \c_zero_int \g_@@_Closing_MiddleHalf_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_nobreak:
+        \exp_args:Nx \@@_add_shrinkable_glue:n
+          {
+            \fp_max:nn
+              {
+                ( \l_@@_current_punct_width_ratio_fp
+                - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+              }
+              \c_zero_fp em
+          }
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+      }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_MiddleHalf_class \c_zero_int
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_nobreak: }
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+            ( \l_@@_current_punct_width_ratio_fp
+            - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+          }
+          \c_zero_fp em
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_allowbreak: }
+    \c_group_end_token
+    \skip_horizontal:N \c_zero_skip
+  }
+
+\XeTeXinterchartoks \c_zero_int \g_@@_Closing_Full_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_Full_class \c_zero_int
+  {
+    \c_group_end_token
+    \skip_horizontal:N \c_zero_skip
+  }
+
+\XeTeXinterchartoks \c_zero_int \g_@@_Opening_RightHalf_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+              \l_@@_punct_width_ratio_fp
+            - \l_@@_punct_min_width_ratio_fp
+          }
+          \c_zero_fp em
+      }
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_RightHalf_class \c_zero_int
+  {
+    \c_group_end_token
+    \@@_nobreak: \skip_horizontal:N \c_zero_skip
+  }
+
+\XeTeXinterchartoks \c_zero_int \g_@@_Opening_Full_class
+  {
+    \@@_allowbreak:
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_Full_class \c_zero_int
+  {
+    \c_group_end_token
+    \@@_nobreak: \skip_horizontal:N \c_zero_skip
+  }
+
+% class boundary
+
+\XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_CJK_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+  }
+
+\XeTeXinterchartoks \g_@@_CJK_class \e@alloc@intercharclass@top
+  {
+    \c_group_end_token
+  }
+
+\XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_Closing_LeftHalf_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN { }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \e@alloc@intercharclass@top
+  {
+    \c_group_end_token
+  }
+
+\XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_Closing_MiddleHalf_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_nobreak:
+        \exp_args:Nx \@@_add_shrinkable_glue:n
+          {
+            \fp_max:nn
+              {
+                ( \l_@@_current_punct_width_ratio_fp
+                - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+              }
+              \c_zero_fp em
+          }
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+      }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_MiddleHalf_class \e@alloc@intercharclass@top
+  {
+    \c_group_end_token
+  }
+
+\XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_Closing_Full_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_Full_class \e@alloc@intercharclass@top
+  {
+    \c_group_end_token
+  }
+
+\XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_Opening_RightHalf_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+    \group_begin: \exp_args:Nc \group_end:
+      {
+        @@_Boundary_
+        \int_use:N \tex_lastnodetype:D
+        _to_Opening_RightHalf:
+      }
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_RightHalf_class \e@alloc@intercharclass@top
+  {
+    \c_group_end_token
+  }
+
+\XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_Opening_Full_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_Full_class \e@alloc@intercharclass@top
+  {
+    \c_group_end_token
+  }
+
+% empty list
+\cs_new_protected:cpn { @@_Boundary_-1_to_Opening_RightHalf: }
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+% hlist node
+\box_new:N \l_@@_tmp_box
+\cs_new_protected:cpn { @@_Boundary_ 1_to_Opening_RightHalf: }
+  {
+    \box_set_to_last:N \l_@@_tmp_box
+    \int_compare:nNnTF \tex_lastnodetype:D = { -1 }
+      {
+        \dim_compare:nNnTF
+          { \box_wd:N \l_@@_tmp_box } = \tex_parindent:D
+          {
+            \dim_compare:nNnTF
+              { \box_ht:N \l_@@_tmp_box } = \c_zero_dim
+              {
+                \dim_compare:nNnTF
+                  { \box_dp:N \l_@@_tmp_box } = \c_zero_dim
+                  { \use_i:nn }
+                  { \use:nn }
+              }
+              { \use:nn }
+          }
+          { \use:nn }
+      }
+      { \use:nn }
+      { \box_use_drop:N \l_@@_tmp_box }
+      {
+        \exp_args:Nx \@@_add_shrinkable_glue:n
+          {
+            \fp_max:nn
+              {
+                  \l_@@_punct_width_ratio_fp
+                - \l_@@_punct_min_width_ratio_fp
+              }
+              \c_zero_fp em
+          }
+      }
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+% rule node
+\cs_new_protected:cpn { @@_Boundary_ 3_to_Opening_RightHalf: }
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+% glue node
+\cs_new_protected:cpn { @@_Boundary_11_to_Opening_RightHalf: }
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+% kern node
+\cs_new_protected:cpn { @@_Boundary_12_to_Opening_RightHalf: }
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+% 字符分类
+
+\newcount \l_@@_CJK_char_int
+\l_@@_CJK_char_int = "3040 ~
+\loop
+  \XeTeXcharclass \l_@@_CJK_char_int = \g_@@_CJK_class
+\ifnum \l_@@_CJK_char_int < "3096 ~
+  \advance \l_@@_CJK_char_int by \c_one_int
+\repeat
+\l_@@_CJK_char_int = "309B ~
+\loop
+  \XeTeXcharclass \l_@@_CJK_char_int = \g_@@_CJK_class
+\ifnum \l_@@_CJK_char_int < "309F ~
+  \advance \l_@@_CJK_char_int by \c_one_int
+\repeat
+\l_@@_CJK_char_int = "30A0 ~
+\loop
+  \XeTeXcharclass \l_@@_CJK_char_int = \g_@@_CJK_class
+\ifnum \l_@@_CJK_char_int < "30FF ~
+  \advance \l_@@_CJK_char_int by \c_one_int
+\repeat
+\l_@@_CJK_char_int = "31F0 ~
+\loop
+  \XeTeXcharclass \l_@@_CJK_char_int = \g_@@_CJK_class
+\ifnum \l_@@_CJK_char_int < "31FF ~
+  \advance \l_@@_CJK_char_int by \c_one_int
+\repeat
+\l_@@_CJK_char_int = "4E00 ~
+\loop
+  \XeTeXcharclass \l_@@_CJK_char_int = \g_@@_CJK_class
+\ifnum \l_@@_CJK_char_int < "9FFF ~
+  \advance \l_@@_CJK_char_int by \c_one_int
+\repeat
+
+\clist_map_inline:nn
+  {
+% 简体中文与英文共用的引号
+    "2019 , "201D ,
+% 简体中文横排
+    "3001 , "3002 , "FF01 , "FF0C , "FF0E ,
+    "FF1A , "FF1B , "FF1F ,
+% 通用横排
+    "3009 , "300B , "300D , "300F , "3011 ,
+    "3015 , "3017 , "3019 , "301B , "301E ,
+    "301F , "FF09 , "FF3D , "FF5D , "FF60 ,
+% 简体中文直排
+    "FE10 , "FE11 , "FE12 ,
+% 通用直排
+    "FE18 , "FE36 , "FE38 , "FE3A , "FE3C ,
+    "FE3E , "FE40 , "FE42 , "FE44 , "FE48 ,
+% 日文音调符号，不允许出现在行首
+    "309B , "309C
+  }
+  {
+    \XeTeXcharclass #1 = \g_@@_Closing_LeftHalf_class
+  }
+
+\clist_map_inline:nn
+  {
+% 港台间隔号
+    "2027 ,
+% 日文间隔号
+    "30A0 , "30FB ,
+% 不太确定
+%    "FF02 , "FF07 , "FF3E , "FF40 , "FF5C , "FFE4 ,
+% 直排 En Dash
+    "FE32
+  }
+  {
+    \XeTeXcharclass #1 = \g_@@_Closing_MiddleHalf_class
+  }
+
+\clist_map_inline:nn
+  {
+% 中西共用的标点
+    "2014 , "2015 , "2025 , "2026 ,
+% 通用横排
+    "301C , "3030 , "FF05 , "FF5E , "FFE0 ,
+% 简体、繁体中文直排，日文的会旋转成水平的
+    "FE13 ,
+% 通用直排
+    "FE14 , "FE15 , "FE16 , "FE19 , "FE30 ,
+    "FE31 ,
+% Small Form Variants
+    "FE50 , "FE51 , "FE52 , "FE54 , "FE55 ,
+    "FE56 , "FE57 , "FE58 , "FE5A , "FE5C ,
+    "FE5E , "FE6A ,
+% 叠字符号、日文长音符，不允许出现在行首
+    "3005 , "3031 , "3032 , "3033 , "3034 ,
+    "3035 , "303B , "309D , "309E , "30FC ,
+    "30FD , "30FE ,
+% 日文小平假名
+    "3041 , "3043 , "3045 , "3047 , "3049 ,
+    "3063 , "3083 , "3085 , "3087 , "308E ,
+    "3095 , "3096 ,
+% 日文小片假名
+    "30A1 , "30A3 , "30A5 , "30A7 , "30A9 ,
+    "30C3 , "30E3 , "30E5 , "30E7 , "30EE ,
+    "30F5 , "30F6 ,
+% 日文小片假名扩展
+    "31F0 , "31F1 , "31F2 , "31F3 , "31F4 ,
+    "31F5 , "31F6 , "31F7 , "31F8 , "31F9 ,
+    "31FA , "31FB , "31FC , "31FD , "31FE ,
+    "31FF
+  }
+  {
+    \XeTeXcharclass #1 = \g_@@_Closing_Full_class
+  }
+
+\clist_map_inline:nn
+  {
+% 变宽或半宽的标点，原则上是居中占满的，所以两端不做挤压调整
+% 中西共用的标点
+    "00B7 , "2013 , "2E3A , "2E3B ,
+% 半宽标点
+    "FF61 , "FF63 , "FF64 , "FF65 ,
+% 半宽日文音调符号，不允许出现在行首
+    "FF70 , "FF9E , "FF9F
+  }
+  {
+    \XeTeXcharclass #1 = \g_@@_Closing_Full_class
+  }
+
+\clist_map_inline:nn
+  {
+% 简体中文与英文共用的引号
+    "2018 , "201C ,
+% 通用横排
+    "3008 , "300A , "300C , "300E , "3010 ,
+    "3014 , "3016 , "3018 , "301A , "301D ,
+    "FF08 , "FF3B , "FF5B , "FF5F ,
+% 通用直排
+    "FE17 , "FE35 , "FE37 , "FE39 , "FE3B ,
+    "FE3D , "FE3F , "FE41 , "FE43 , "FE47
+  }
+  {
+    \XeTeXcharclass #1 = \g_@@_Opening_RightHalf_class
+  }
+
+\clist_map_inline:nn
+  {
+    "FF03 , "FF04 , "FFE1 , "FFE5 , "FFE6 ,
+% Small Form Variants
+    "FE59 , "FE5B , "FE5D , "FE5F , "FE69 ,
+% 日文邮编/邮局记号、日文庵点，不允许出现在行末
+    "3012 , "3020 , "3036 , "303D
+  }
+  {
+    \XeTeXcharclass #1 = \g_@@_Opening_Full_class
+  }
+
+\clist_map_inline:nn
+  {
+% 半宽标点
+    "FF62
+  }
+  {
+    \XeTeXcharclass #1 = \g_@@_Opening_Full_class
+  }
+
+\clist_map_inline:nn
+  {
+    "3002 , "FF01 , "FF0E ,
+    "FF1A , "FF1B , "FF1F ,
+    "FE12
+  }
+  {
+    \clist_put_right:Nn \l_@@_end_sentence_punct_clist {#1}
+  }
+
+\clist_map_inline:nn
+  {
+    "3001 , "3002 , "FF0C , "FF0E ,
+    "FE10 , "FE11 , "FE12
+  }
+  {
+    \clist_put_right:Nn \l_@@_hangable_punct_clist {#1}
+  }
+
+\ExplSyntaxOff
+\makeatother
