@@ -59,7 +59,7 @@
     \SetEndSentencePunctWidthRatio { 1 }
     \SetPunctMinWidthRatio { 0.5 }
     \SetMiddlePunctMinWidthRatio { 0.5 }
-    \SetPunctKernWidthRatio { 0.5 }
+    \SetPunctKernWidthRatio { -0.5 }
   }
 \cs_new_protected:Npn \banjiaostyle
   {
@@ -67,7 +67,7 @@
     \SetEndSentencePunctWidthRatio { 0.5 }
     \SetPunctMinWidthRatio { 0.5 }
     \SetMiddlePunctMinWidthRatio { 0.5 }
-    \SetPunctKernWidthRatio { 0.5 }
+    \SetPunctKernWidthRatio { -0.5 }
   }
 \cs_new_protected:Npn \kaimingstyle
   {
@@ -75,7 +75,7 @@
     \SetEndSentencePunctWidthRatio { 1 }
     \SetPunctMinWidthRatio { 0.5 }
     \SetMiddlePunctMinWidthRatio { 0.5 }
-    \SetPunctKernWidthRatio { 0.5 }
+    \SetPunctKernWidthRatio { -0.5 }
   }
 \cs_new_protected:Npn \plainstyle
   {
@@ -85,6 +85,13 @@
     \SetMiddlePunctMinWidthRatio { 1 }
     \SetPunctKernWidthRatio { 0 }
   }
+
+\tl_new:N \l_@@_CJK_condensed_ratio_tl
+\cs_new_protected:Npn \SetCJKCondensedRatio #1
+  {
+    \tl_set:Nn \l_@@_CJK_condensed_ratio_tl {#1}
+  }
+\SetCJKCondensedRatio { 1 / 1 }
 
 \bool_new:N       \l_@@_enable_hanging_punct_bool
 \bool_set_false:N \l_@@_enable_hanging_punct_bool
@@ -122,11 +129,24 @@
     \tex_vrule:D
       height \c_zero_dim
       depth  \c_zero_dim
-      width  - #1
+      width
+        - \tex_dimexpr:D
+            #1 * \l_@@_CJK_condensed_ratio_tl
+          \tex_relax:D
+  }
+
+\cs_new_protected:Npn \@@_remove_blank_add_glue:n #1
+  {
+    \@@_remove_blank:n {#1}
+    \skip_horizontal:n
+      { #1 * \l_@@_CJK_condensed_ratio_tl }
   }
 
 \cs_new_protected:Npn \@@_add_shrinkable_glue:n #1
-  { \skip_horizontal:n { #1 minus #1 } }
+  {
+    \skip_horizontal:n
+      { #1 minus #1 * \l_@@_CJK_condensed_ratio_tl }
+  }
 
 \bool_new:N \l_@@_keep_current_punct_blank_bool
 \bool_new:N \l_@@_hang_current_punct_bool
@@ -201,9 +221,7 @@
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
     \bool_if:NT \l_@@_hang_current_punct_bool
       {
-        \@@_remove_blank:n
-          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
-        \skip_horizontal:n
+        \@@_remove_blank_add_glue:n
           { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
         \bool_if:NF \l_@@_keep_current_punct_blank_bool
           { \@@_allowbreak: }
@@ -306,9 +324,7 @@
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
     \bool_if:NT \l_@@_hang_current_punct_bool
       {
-        \@@_remove_blank:n
-          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
-        \skip_horizontal:n
+        \@@_remove_blank_add_glue:n
           { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
         \bool_if:NF \l_@@_keep_current_punct_blank_bool
           { \@@_allowbreak: }
@@ -364,9 +380,7 @@
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
     \bool_if:NT \l_@@_hang_current_punct_bool
       {
-        \@@_remove_blank:n
-          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
-        \skip_horizontal:n
+        \@@_remove_blank_add_glue:n
           { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
         \bool_if:NF \l_@@_keep_current_punct_blank_bool
           { \@@_allowbreak: }
@@ -656,9 +670,7 @@
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
     \bool_if:NT \l_@@_hang_current_punct_bool
       {
-        \@@_remove_blank:n
-          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
-        \skip_horizontal:n
+        \@@_remove_blank_add_glue:n
           { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
         \bool_if:NF \l_@@_keep_current_punct_blank_bool
           { \@@_allowbreak: }
@@ -1093,8 +1105,8 @@
 \clist_map_inline:nn
   {
     "3002 , "FF01 , "FF0E ,
-    "FF1A , "FF1B , "FF1F ,
-    "FE12
+%    "FF1A , "FF1B ,
+    "FF1F , "FE12
   }
   {
     \clist_put_right:Nn \l_@@_end_sentence_punct_clist {#1}
