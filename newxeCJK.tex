@@ -87,11 +87,23 @@
   }
 
 \tl_new:N \l_@@_CJK_condensed_ratio_tl
+\msg_new:nnnn { newxeCJK } { decimal-not-allowed }
+  { The~expression~'#1'~must~be~converted~into~a~fraction. }
+  {
+    For~example,~if~you~want~'0.8',~
+    then~you~should~write~'8/10'~or~'4/5'.
+  }
 \cs_new_protected:Npn \SetCJKCondensedRatio #1
   {
-    \tl_set:Nn \l_@@_CJK_condensed_ratio_tl {#1}
+    \str_if_in:nnTF {#1} { . }
+      {
+        \msg_error:nnn { newxeCJK } { decimal-not-allowed } {#1}
+      }
+      {
+        \tl_set:Nn \l_@@_CJK_condensed_ratio_tl {#1}
+      }
   }
-\SetCJKCondensedRatio { 1 / 1 }
+\SetCJKCondensedRatio { 1 }
 
 \bool_new:N       \l_@@_enable_hanging_punct_bool
 \bool_set_false:N \l_@@_enable_hanging_punct_bool
