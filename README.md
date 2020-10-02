@@ -14,6 +14,33 @@
 引擎的版本是否最新，也不考虑向后兼容 `xeCJK`。希望
 `newxeCJK` 提供的思路能在不久的将来成为 `xeCJK` 的一部分。
 
+## 向用户公开的命令 / Public commands
+
+### 标点符号的排版样式
+
+- [x] 全角样式：`\quanjiaostyle`
+- [x] 半角样式：`\banjiaostyle`
+- [x] 开明样式：`\kaimingstyle`
+- [x] 不作调整：`\plainstyle`
+
+### 本地化
+
+- [x] 简中横排：`\ChineseSimplifiedH`
+- [ ] 简中直排：`\ChineseSimplifiedV`
+- [ ] 繁中横排：`\ChineseTraditionalH`
+- [ ] 繁中直排：`\ChineseTraditionalV`
+- [ ] 日文横排：`\JapaneseH`
+- [ ] 日文直排：`\JapaneseV`
+
+### 细节控制
+
+- [x] `\SetPunctWidthRatio{<decimal number>}`
+- [x] `\SetEndSentencePunctWidthRatio{<decimal number>}`
+- [x] `\SetPunctMinWidthRatio{<decimal number>}`
+- [x] `\SetMiddlePunctMinWidthRatio{<decimal number>}`
+- [x] `\SetPunctKernWidthRatio{<decimal number>}`
+- [x] `\SetCJKCondensedRatio{<fraction>}`
+
 ## Copyright and License
 
     Copyright 2020 Ruixi Zhang <ruixizhang42@gmail.com>
