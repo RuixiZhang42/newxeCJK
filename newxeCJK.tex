@@ -12,7 +12,6 @@
   {
     \fp_set:Nn \l_@@_punct_width_ratio_fp {#1}
   }
-\SetPunctWidthRatio { 1 }
 
 \fp_new:N    \l_@@_end_sentence_punct_width_ratio_fp
 \clist_new:N \l_@@_end_sentence_punct_clist
@@ -20,7 +19,6 @@
   {
     \fp_set:Nn \l_@@_end_sentence_punct_width_ratio_fp {#1}
   }
-\SetEndSentencePunctWidthRatio { 1 }
 
 \fp_new:N \l_@@_punct_min_width_ratio_fp
 \fp_new:N \l_@@_punct_removable_width_ratio_fp
@@ -31,7 +29,6 @@
       \l_@@_punct_removable_width_ratio_fp
       { \fp_max:nn { 1 - #1 } \c_zero_fp }
   }
-\SetPunctMinWidthRatio { 0.5 }
 
 \fp_new:N \l_@@_mid_punct_min_width_ratio_fp
 \fp_new:N \l_@@_mid_punct_removable_width_ratio_fp
@@ -42,7 +39,6 @@
       \l_@@_mid_punct_removable_width_ratio_fp
       { \fp_max:nn { ( 1 - #1 ) / 2 } \c_zero_fp }
   }
-\SetMiddlePunctMinWidthRatio { 0.5 }
 
 \fp_new:N \l_@@_punct_kern_width_ratio_fp
 \cs_new_protected:Npn \SetPunctKernWidthRatio #1
@@ -51,7 +47,6 @@
       \l_@@_punct_kern_width_ratio_fp
       { \fp_abs:n {#1} }
   }
-\SetPunctKernWidthRatio { -0.5 }
 
 \cs_new_protected:Npn \quanjiaostyle
   {
@@ -61,6 +56,7 @@
     \SetMiddlePunctMinWidthRatio { 0.5 }
     \SetPunctKernWidthRatio { -0.5 }
   }
+\quanjiaostyle
 \cs_new_protected:Npn \banjiaostyle
   {
     \SetPunctWidthRatio { 0.5 }
@@ -956,182 +952,157 @@
 
 % 字符分类
 
-\newcount \l_@@_CJK_char_int
-\l_@@_CJK_char_int = "3040 ~
-\loop
-  \XeTeXcharclass \l_@@_CJK_char_int = \g_@@_CJK_class
-\ifnum \l_@@_CJK_char_int < "3096 ~
-  \advance \l_@@_CJK_char_int by \c_one_int
-\repeat
-\l_@@_CJK_char_int = "309B ~
-\loop
-  \XeTeXcharclass \l_@@_CJK_char_int = \g_@@_CJK_class
-\ifnum \l_@@_CJK_char_int < "309F ~
-  \advance \l_@@_CJK_char_int by \c_one_int
-\repeat
-\l_@@_CJK_char_int = "30A0 ~
-\loop
-  \XeTeXcharclass \l_@@_CJK_char_int = \g_@@_CJK_class
-\ifnum \l_@@_CJK_char_int < "30FF ~
-  \advance \l_@@_CJK_char_int by \c_one_int
-\repeat
-\l_@@_CJK_char_int = "31F0 ~
-\loop
-  \XeTeXcharclass \l_@@_CJK_char_int = \g_@@_CJK_class
-\ifnum \l_@@_CJK_char_int < "31FF ~
-  \advance \l_@@_CJK_char_int by \c_one_int
-\repeat
-\l_@@_CJK_char_int = "4E00 ~
-\loop
-  \XeTeXcharclass \l_@@_CJK_char_int = \g_@@_CJK_class
-\ifnum \l_@@_CJK_char_int < "9FFF ~
-  \advance \l_@@_CJK_char_int by \c_one_int
-\repeat
-
-\clist_map_inline:nn
+\cs_new_protected:Npn \@@_assign_charclass_to_charcode:Nn #1#2
   {
-% 简体中文与英文共用的引号
-    "2019 , "201D ,
-% 简体中文横排
-    "3001 , "3002 , "FF01 , "FF0C , "FF0E ,
-    "FF1A , "FF1B , "FF1F ,
-% 通用横排
-    "3009 , "300B , "300D , "300F , "3011 ,
-    "3015 , "3017 , "3019 , "301B , "301E ,
-    "301F , "FF09 , "FF3D , "FF5D , "FF60 ,
-% 简体中文直排
-    "FE10 , "FE11 , "FE12 ,
-% 通用直排
-    "FE18 , "FE36 , "FE38 , "FE3A , "FE3C ,
-    "FE3E , "FE40 , "FE42 , "FE44 , "FE48 ,
-% 日文音调符号，不允许出现在行首
-    "309B , "309C
-  }
-  {
-    \XeTeXcharclass #1 = \g_@@_Closing_LeftHalf_class
+    \clist_map_inline:nn {#2}
+      { \@@_assign_charclass_to_charcode_aux:Nw #1##1 - - \q_stop }
   }
 
-\clist_map_inline:nn
+\cs_new_protected:Npn \@@_assign_charclass_to_charcode_aux:Nw
+  #1#2 - #3 - #4 \q_stop
   {
-% 港台间隔号
-    "2027 ,
-% 日文间隔号
-    "30A0 , "30FB ,
-% 不太确定
-%    "FF02 , "FF07 , "FF3E , "FF40 , "FF5C , "FFE4 ,
-% 直排 En Dash
-    "FE32
-  }
-  {
-    \XeTeXcharclass #1 = \g_@@_Closing_MiddleHalf_class
-  }
-
-\clist_map_inline:nn
-  {
-% 中西共用的标点
-    "2014 , "2015 , "2025 , "2026 ,
-% 通用横排
-    "301C , "3030 , "FF05 , "FF5E , "FFE0 ,
-% 简体、繁体中文直排，日文的会旋转成水平的
-    "FE13 ,
-% 通用直排
-    "FE14 , "FE15 , "FE16 , "FE19 , "FE30 ,
-    "FE31 ,
-% Small Form Variants
-    "FE50 , "FE51 , "FE52 , "FE54 , "FE55 ,
-    "FE56 , "FE57 , "FE58 , "FE5A , "FE5C ,
-    "FE5E , "FE6A ,
-% 叠字符号、日文长音符，不允许出现在行首
-    "3005 , "3031 , "3032 , "3033 , "3034 ,
-    "3035 , "303B , "309D , "309E , "30FC ,
-    "30FD , "30FE ,
-% 日文小平假名
-    "3041 , "3043 , "3045 , "3047 , "3049 ,
-    "3063 , "3083 , "3085 , "3087 , "308E ,
-    "3095 , "3096 ,
-% 日文小片假名
-    "30A1 , "30A3 , "30A5 , "30A7 , "30A9 ,
-    "30C3 , "30E3 , "30E5 , "30E7 , "30EE ,
-    "30F5 , "30F6 ,
-% 日文小片假名扩展
-    "31F0 , "31F1 , "31F2 , "31F3 , "31F4 ,
-    "31F5 , "31F6 , "31F7 , "31F8 , "31F9 ,
-    "31FA , "31FB , "31FC , "31FD , "31FE ,
-    "31FF
-  }
-  {
-    \XeTeXcharclass #1 = \g_@@_Closing_Full_class
+    \int_set:Nn \l_tmpa_int {#2}
+    \tl_if_empty:nTF {#3}
+      { \tex_XeTeXcharclass:D \l_tmpa_int = #1 }
+      {
+        \int_compare:nNnTF \l_tmpa_int > {#3}
+          {
+          }
+          {
+            \int_do_until:nNnn \l_tmpa_int > {#3}
+              {
+                \tex_XeTeXcharclass:D \l_tmpa_int = #1
+                \int_incr:N \l_tmpa_int
+              }
+          }
+      }
   }
 
-\clist_map_inline:nn
+\@@_assign_charclass_to_charcode:Nn \g_@@_CJK_class
   {
-% 变宽或半宽的标点，原则上是居中占满的，所以两端不做挤压调整
-% 中西共用的标点
-    "00B7 , "2013 , "2E3A , "2E3B ,
-% 半宽标点
-    "FF61 , "FF63 , "FF64 , "FF65 ,
-% 半宽日文音调符号，不允许出现在行首
-    "FF70 , "FF9E , "FF9F
-  }
-  {
-    \XeTeXcharclass #1 = \g_@@_Closing_Full_class
+    "3040 - "3096 ,
+    "309B - "309F ,
+    "30A0 - "30FF ,
+    "31F0 - "31FF ,
+    "4E00 - "9FFF ,
+    "FF00 - "FFEF
   }
 
-\clist_map_inline:nn
-  {
-% 简体中文与英文共用的引号
-    "2018 , "201C ,
-% 通用横排
-    "3008 , "300A , "300C , "300E , "3010 ,
-    "3014 , "3016 , "3018 , "301A , "301D ,
-    "FF08 , "FF3B , "FF5B , "FF5F ,
-% 通用直排
-    "FE17 , "FE35 , "FE37 , "FE39 , "FE3B ,
-    "FE3D , "FE3F , "FE41 , "FE43 , "FE47
-  }
-  {
-    \XeTeXcharclass #1 = \g_@@_Opening_RightHalf_class
-  }
-
-\clist_map_inline:nn
-  {
-    "FF03 , "FF04 , "FFE1 , "FFE5 , "FFE6 ,
-% Small Form Variants
-    "FE59 , "FE5B , "FE5D , "FE5F , "FE69 ,
-% 日文邮编/邮局记号、日文庵点，不允许出现在行末
-    "3012 , "3020 , "3036 , "303D
-  }
-  {
-    \XeTeXcharclass #1 = \g_@@_Opening_Full_class
-  }
-
-\clist_map_inline:nn
-  {
-% 半宽标点
-    "FF62
-  }
-  {
-    \XeTeXcharclass #1 = \g_@@_Opening_Full_class
-  }
-
-\clist_map_inline:nn
+\clist_set:Nn \l_@@_end_sentence_punct_clist
   {
     "3002 , "FF01 , "FF0E ,
 %    "FF1A , "FF1B ,
     "FF1F , "FE12
   }
-  {
-    \clist_put_right:Nn \l_@@_end_sentence_punct_clist {#1}
-  }
 
-\clist_map_inline:nn
+\clist_set:Nn \l_@@_hangable_punct_clist
   {
     "3001 , "3002 , "FF0C , "FF0E ,
     "FE10 , "FE11 , "FE12
   }
+
+\cs_new_protected:Npn \ChineseSimplifiedH
   {
-    \clist_put_right:Nn \l_@@_hangable_punct_clist {#1}
+    \clist_clear:N \l_@@_keep_blank_punct_clist
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_LeftHalf_class
+      {
+% 简体中文与英文共用的引号
+        "2019 , "201D ,
+% 简体中文横排
+        "3001 , "3002 , "FF01 , "FF0C , "FF0E ,
+        "FF1A , "FF1B , "FF1F ,
+% 通用横排
+        "3009 , "300B , "300D , "300F , "3011 ,
+        "3015 , "3017 , "3019 , "301B , "301E ,
+        "301F , "FF09 , "FF3D , "FF5D , "FF60 ,
+% 简体中文直排
+        "FE10 , "FE11 , "FE12 ,
+% 通用直排
+        "FE18 , "FE36 , "FE38 , "FE3A , "FE3C ,
+        "FE3E , "FE40 , "FE42 , "FE44 , "FE48 ,
+% 日文音调符号，不允许出现在行首
+        "309B , "309C
+      }
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_MiddleHalf_class
+      {
+% 港台间隔号
+        "2027 ,
+% 日文间隔号
+        "30A0 , "30FB ,
+% 不太确定
+        "FF5C , "FFE4 ,
+%        "FF02 , "FF07 , "FF3E , "FF40 ,
+% 直排 En Dash
+        "FE32
+      }
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+      {
+% 中西共用的标点
+        "2014 , "2015 , "2025 , "2026 ,
+% 通用横排
+        "301C , "3030 , "FF05 , "FF5E , "FFE0 ,
+% 数学符号
+        "FF0A , "FF0B , "FF0D , "FF0F ,
+        "FF1C , "FF1D , "FF1E , "FF3C ,
+% 简体、繁体中文直排，日文的会旋转成水平的
+        "FE13 ,
+% 通用直排
+        "FE14 , "FE15 , "FE16 , "FE19 , "FE30 ,
+        "FE31 ,
+% Small Form Variants
+        "FE50 , "FE51 , "FE52 , "FE54 , "FE55 ,
+        "FE56 , "FE57 , "FE58 , "FE5A , "FE5C ,
+        "FE5E , "FE61 , "FE62 , "FE63 , "FE64 ,
+        "FE65 , "FE66 , "FE68 , "FE6A ,
+% 叠字符号、日文长音符，不允许出现在行首
+        "3005 , "3031 , "3032 , "3033 , "3034 ,
+        "3035 , "303B , "309D , "309E , "30FC ,
+        "30FD , "30FE ,
+% 日文小平假名
+        "3041 , "3043 , "3045 , "3047 , "3049 ,
+        "3063 , "3083 , "3085 , "3087 , "308E ,
+        "3095 , "3096 ,
+% 日文小片假名
+        "30A1 , "30A3 , "30A5 , "30A7 , "30A9 ,
+        "30C3 , "30E3 , "30E5 , "30E7 , "30EE ,
+        "30F5 , "30F6 ,
+% 日文小片假名扩展
+        "31F0 , "31F1 , "31F2 , "31F3 , "31F4 ,
+        "31F5 , "31F6 , "31F7 , "31F8 , "31F9 ,
+        "31FA , "31FB , "31FC , "31FD , "31FE ,
+        "31FF ,
+% 变宽或半宽的标点，原则上是居中占满的，所以两端不做挤压调整
+% 中西共用的标点
+        "00B7 , "2013 , "2E3A , "2E3B ,
+% 半宽标点
+        "FF61 , "FF63 , "FF64 , "FF65 , "FFE8 ,
+% 半宽日文音调符号，不允许出现在行首
+        "FF70 , "FF9E , "FF9F
+      }
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Opening_RightHalf_class
+      {
+% 简体中文与英文共用的引号
+        "2018 , "201C ,
+% 通用横排
+        "3008 , "300A , "300C , "300E , "3010 ,
+        "3014 , "3016 , "3018 , "301A , "301D ,
+        "FF08 , "FF3B , "FF5B , "FF5F ,
+% 通用直排
+        "FE17 , "FE35 , "FE37 , "FE39 , "FE3B ,
+        "FE3D , "FE3F , "FE41 , "FE43 , "FE47
+      }
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Opening_Full_class
+      {
+        "FF03 , "FF04 , "FFE1 , "FFE5 , "FFE6 ,
+% Small Form Variants
+        "FE59 , "FE5B , "FE5D , "FE5F , "FE69 ,
+% 日文邮编/邮局记号、日文庵点，不允许出现在行末
+        "3012 , "3020 , "3036 , "303D ,
+% 半宽标点
+        "FF62
+      }
   }
+\ChineseSimplifiedH
 
 \ExplSyntaxOff
 \makeatother
