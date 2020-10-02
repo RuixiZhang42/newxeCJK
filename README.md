@@ -26,7 +26,7 @@
 ### 本地化
 
 - [x] 简中横排：`\ChineseSimplifiedH`
-- [ ] 简中直排：`\ChineseSimplifiedV`
+- [x] 简中直排：`\ChineseSimplifiedV`
 - [ ] 繁中横排：`\ChineseTraditionalH`
 - [ ] 繁中直排：`\ChineseTraditionalV`
 - [ ] 日文横排：`\JapaneseH`

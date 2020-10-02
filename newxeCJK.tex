@@ -958,6 +958,12 @@
       { \@@_assign_charclass_to_charcode_aux:Nw #1##1 - - \q_stop }
   }
 
+\msg_new:nnnn { newxeCJK } { invalid-range }
+  { The~start~index~(#1)~is~greater~than~the~end~index~(#2). }
+  {
+    A~valid~range~should~have~its~start~index~
+    less~than~or~equal~to~its~end~index.
+  }
 \cs_new_protected:Npn \@@_assign_charclass_to_charcode_aux:Nw
   #1#2 - #3 - #4 \q_stop
   {
@@ -967,6 +973,7 @@
       {
         \int_compare:nNnTF \l_tmpa_int > {#3}
           {
+            \msg_error:nnnn { newxeCJK } { invalid-range } {#2} {#3}
           }
           {
             \int_do_until:nNnn \l_tmpa_int > {#3}
@@ -990,9 +997,7 @@
 
 \clist_set:Nn \l_@@_end_sentence_punct_clist
   {
-    "3002 , "FF01 , "FF0E ,
-%    "FF1A , "FF1B ,
-    "FF1F , "FE12
+    "3002 , "FF01 , "FF0E , "FF1F , "FE12
   }
 
 \clist_set:Nn \l_@@_hangable_punct_clist
@@ -1067,10 +1072,7 @@
         "30C3 , "30E3 , "30E5 , "30E7 , "30EE ,
         "30F5 , "30F6 ,
 % 日文小片假名扩展
-        "31F0 , "31F1 , "31F2 , "31F3 , "31F4 ,
-        "31F5 , "31F6 , "31F7 , "31F8 , "31F9 ,
-        "31FA , "31FB , "31FC , "31FD , "31FE ,
-        "31FF ,
+        "31F0 - "31FF ,
 % 变宽或半宽的标点，原则上是居中占满的，所以两端不做挤压调整
 % 中西共用的标点
         "00B7 , "2013 , "2E3A , "2E3B ,
@@ -1103,6 +1105,15 @@
       }
   }
 \ChineseSimplifiedH
+
+\cs_new_protected:Npn \ChineseSimplifiedV
+  {
+    \ChineseSimplifiedH
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+      {
+        "FF01 , "FF1A , "FF1B , "FF1F
+      }
+  }
 
 \ExplSyntaxOff
 \makeatother
