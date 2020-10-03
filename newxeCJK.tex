@@ -116,6 +116,7 @@
 \newXeTeXintercharclass \g_@@_Closing_Full_class
 \newXeTeXintercharclass \g_@@_Opening_RightHalf_class
 \newXeTeXintercharclass \g_@@_Opening_Full_class
+\newXeTeXintercharclass \g_@@_non_CJK_Punct_class
 
 \cs_new_protected:Npn \@@_nobreak:
   { \tex_penalty:D 10 000 ~ }
@@ -791,6 +792,146 @@
     \@@_nobreak: \skip_horizontal:N \c_zero_skip
   }
 
+% class non-CJK punctuation
+
+\XeTeXinterchartoks \g_@@_non_CJK_Punct_class \g_@@_CJK_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+  }
+
+\XeTeXinterchartoks \g_@@_CJK_class \g_@@_non_CJK_Punct_class
+  {
+    \c_group_end_token
+  }
+
+\XeTeXinterchartoks \g_@@_non_CJK_Punct_class \g_@@_Closing_LeftHalf_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN { }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_non_CJK_Punct_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \bool_if:NT \l_@@_hang_current_punct_bool
+      {
+        \@@_remove_blank_add_glue:n
+          { \fp_use:N \l_@@_punct_min_width_ratio_fp em }
+        \bool_if:NF \l_@@_keep_current_punct_blank_bool
+          { \@@_allowbreak: }
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_nobreak: }
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+              \l_@@_current_punct_width_ratio_fp
+            - \l_@@_punct_min_width_ratio_fp
+          }
+          \c_zero_fp em
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_allowbreak: }
+    \c_group_end_token
+    \skip_horizontal:N \c_zero_skip
+  }
+
+\XeTeXinterchartoks \g_@@_non_CJK_Punct_class \g_@@_Closing_MiddleHalf_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+    \@@_set_current_punct_width_ratio:
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_nobreak:
+        \exp_args:Nx \@@_add_shrinkable_glue:n
+          {
+            \fp_max:nn
+              {
+                ( \l_@@_current_punct_width_ratio_fp
+                - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+              }
+              \c_zero_fp em
+          }
+        \@@_remove_blank:n
+          { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+      }
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_MiddleHalf_class \g_@@_non_CJK_Punct_class
+  {
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_mid_punct_removable_width_ratio_fp em }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_nobreak: }
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+            ( \l_@@_current_punct_width_ratio_fp
+            - \l_@@_mid_punct_min_width_ratio_fp ) / 2
+          }
+          \c_zero_fp em
+      }
+    \bool_if:NT \l_@@_keep_current_punct_blank_bool
+      { \@@_allowbreak: }
+    \c_group_end_token
+    \skip_horizontal:N \c_zero_skip
+  }
+
+\XeTeXinterchartoks \g_@@_non_CJK_Punct_class \g_@@_Closing_Full_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+  }
+
+\XeTeXinterchartoks \g_@@_Closing_Full_class \g_@@_non_CJK_Punct_class
+  {
+    \c_group_end_token
+    \skip_horizontal:N \c_zero_skip
+  }
+
+\XeTeXinterchartoks \g_@@_non_CJK_Punct_class \g_@@_Opening_RightHalf_class
+  {
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+    \exp_args:Nx \@@_add_shrinkable_glue:n
+      {
+        \fp_max:nn
+          {
+              \l_@@_punct_width_ratio_fp
+            - \l_@@_punct_min_width_ratio_fp
+          }
+          \c_zero_fp em
+      }
+    \@@_remove_blank:n
+      { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_non_CJK_Punct_class
+  {
+    \c_group_end_token
+    \@@_nobreak: \skip_horizontal:N \c_zero_skip
+  }
+
+\XeTeXinterchartoks \g_@@_non_CJK_Punct_class \g_@@_Opening_Full_class
+  {
+    \@@_allowbreak:
+    \c_group_begin_token
+    \@@_clear_Boundary_to_CJK_interchartoks:
+  }
+
+\XeTeXinterchartoks \g_@@_Opening_Full_class \g_@@_non_CJK_Punct_class
+  {
+    \c_group_end_token
+    \@@_nobreak: \skip_horizontal:N \c_zero_skip
+  }
+
 % class boundary
 
 \XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_CJK_class
@@ -993,6 +1134,14 @@
     "31F0 - "31FF ,
     "4E00 - "9FFF ,
     "FF00 - "FFEF
+  }
+
+\@@_assign_charclass_to_charcode:Nn \g_@@_non_CJK_Punct_class
+  {
+    "21 - "2F ,
+    "3A - "40 ,
+    "5B - "60 ,
+    "7B - "7E
   }
 
 \clist_set:Nn \l_@@_end_sentence_punct_clist
