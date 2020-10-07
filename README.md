@@ -29,8 +29,8 @@
 - [x] 简中直排：`\ChineseSimplifiedV`
 - [x] 繁中横排：`\ChineseTraditionalH`
 - [x] 繁中直排：`\ChineseTraditionalV`
-- [ ] 日文横排：`\JapaneseH`
-- [ ] 日文直排：`\JapaneseV`
+- [x] 日文横排：`\JapaneseH`
+- [x] 日文直排：`\JapaneseV`
 
 ### 细节控制
 

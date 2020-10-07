@@ -1320,5 +1320,32 @@
     \@@_assign_non_CJK_Punct_class:
   }
 
+\cs_new_protected:Npn \JapaneseH
+  {
+    \ChineseSimplifiedH
+    \clist_set:Nn \l_@@_keep_blank_punct_clist
+      {
+        "3002 , "FF0E , "FE12
+      }
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_MiddleHalf_class
+      {
+        "FF1A , "FF1B
+      }
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+      {
+        "FF01 , "FF1F
+      }
+    \@@_assign_non_CJK_Punct_class:
+  }
+
+\cs_new_protected:Npn \JapaneseV
+  {
+    \JapaneseH
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+      {
+        "FF1B
+      }
+  }
+
 \ExplSyntaxOff
 \makeatother
