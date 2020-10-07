@@ -1265,5 +1265,60 @@
       }
   }
 
+% 繁体中文/日文的这些标点可以来自英文字体
+\cs_new_protected:Npn \@@_assign_non_CJK_Punct_class:
+  {
+    \@@_assign_charclass_to_charcode:Nn \g_@@_non_CJK_Punct_class
+      {
+        "2019 , "201D ,
+        "00B7 ,
+        "2018 , "201C ,
+      }
+  }
+
+\cs_new_protected:Npn \ChineseTraditionalH
+  {
+    \ChineseSimplifiedH
+    \clist_set:Nn \l_@@_keep_blank_punct_clist
+      {
+        "2027 ,
+        "3001 , "3002 , "FF01 , "FF0C , "FF0E ,
+        "FF1A , "FF1B ,
+        "FE10 , "FE11 , "FE12
+      }
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_MiddleHalf_class
+      {
+        "3001 , "3002 , "FF01 , "FF0C , "FF0E ,
+        "FF1A , "FF1B ,
+        "FE10 , "FE11 , "FE12
+      }
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+      {
+        "FF1F
+      }
+    \@@_assign_non_CJK_Punct_class:
+  }
+
+\cs_new_protected:Npn \ChineseTraditionalV
+  {
+    \ChineseSimplifiedH
+    \clist_set:Nn \l_@@_keep_blank_punct_clist
+      {
+        "2027 ,
+        "3001 , "3002 , "FF0C , "FF0E ,
+        "FE10 , "FE11 , "FE12
+      }
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_MiddleHalf_class
+      {
+        "3001 , "3002 , "FF0C , "FF0E ,
+        "FE10 , "FE11 , "FE12
+      }
+    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+      {
+        "FF01 , "FF1A , "FF1B , "FF1F
+      }
+    \@@_assign_non_CJK_Punct_class:
+  }
+
 \ExplSyntaxOff
 \makeatother
