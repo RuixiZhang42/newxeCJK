@@ -16,6 +16,11 @@
 
 ## 向用户公开的命令 / Public commands
 
+### 字体设置
+
+- [x] `\setCJKmainfont`, `\setCJKsansfont`, `\setCJKmonofont`
+- [x] `\CJKrmfamily`, `\CJKsffamily`, `\CJKttfamily`
+
 ### 标点符号的排版样式
 
 - [x] 全角样式：`\quanjiaostyle`

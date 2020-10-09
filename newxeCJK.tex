@@ -1,6 +1,40 @@
 \makeatletter
 \ExplSyntaxOn
 
+\tl_new:N \l_@@_CJK_fontfamily_tl
+
+\cs_new:Npn \@@_tmp:w #1 ; #2 \q_stop
+  {
+    \tl_new:c { l_@@_CJK_ #1 family _tl }
+    \exp_args:Nc \NewDocumentCommand { setCJK #2 font }
+      { O{} m O{} }
+      {
+        \exp_args:Nc \setfontfamily { l_@@_CJK_ #1 family _tl }
+          [ Script = CJK~Ideographic , ##1 ] {##2} [##3]
+        \tex_ignorespaces:D
+      }
+    \exp_args:Nc \NewDocumentCommand { CJK #1 family }
+      { }
+      {
+        \tl_set_eq:Nc \l_@@_CJK_fontfamily_tl
+          { l_@@_CJK_ #1 family _tl }
+      }
+% For ltfssini.dtx 2020/01/11 v3.1f or later, until 2020/08/24 v3.2c
+    \tl_put_right:cx { @ #1 familyhook }
+      { \use:c { CJK #1 family } }
+% For ltfssini.dtx 2020/08/24 v3.2c or later
+%    \exp_args:Nnx \AddToHook { #1 family }
+%      { \use:c { CJK #1 family } }
+  }
+
+\clist_map_inline:nn
+  {
+    rm ; main ,
+    sf ; sans ,
+    tt ; mono
+  }
+  { \@@_tmp:w #1 \q_stop }
+
 \tl_new:N  \l_@@_CJKglue_tl
 \tl_set:Nn \l_@@_CJKglue_tl { 0em plus 0.0625em }
 
@@ -657,6 +691,7 @@
   {
     \@@_insert_CJKecglue:
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
   }
 
@@ -669,6 +704,7 @@
 \XeTeXinterchartoks \c_zero_int \g_@@_Closing_LeftHalf_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \@@_set_current_punct_width_ratio:
     \@@_preprocess_closing_punct:nN { }
@@ -705,6 +741,7 @@
 \XeTeXinterchartoks \c_zero_int \g_@@_Closing_MiddleHalf_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \@@_set_current_punct_width_ratio:
     \@@_preprocess_closing_punct:nN
@@ -748,6 +785,7 @@
 \XeTeXinterchartoks \c_zero_int \g_@@_Closing_Full_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
   }
 
@@ -760,6 +798,7 @@
 \XeTeXinterchartoks \c_zero_int \g_@@_Opening_RightHalf_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \exp_args:Nx \@@_add_shrinkable_glue:n
       {
@@ -784,6 +823,7 @@
   {
     \@@_allowbreak:
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
   }
 
@@ -798,6 +838,7 @@
 \XeTeXinterchartoks \g_@@_non_CJK_Punct_class \g_@@_CJK_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
   }
 
@@ -809,6 +850,7 @@
 \XeTeXinterchartoks \g_@@_non_CJK_Punct_class \g_@@_Closing_LeftHalf_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \@@_set_current_punct_width_ratio:
     \@@_preprocess_closing_punct:nN { }
@@ -845,6 +887,7 @@
 \XeTeXinterchartoks \g_@@_non_CJK_Punct_class \g_@@_Closing_MiddleHalf_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \@@_set_current_punct_width_ratio:
     \@@_preprocess_closing_punct:nN
@@ -888,6 +931,7 @@
 \XeTeXinterchartoks \g_@@_non_CJK_Punct_class \g_@@_Closing_Full_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
   }
 
@@ -900,6 +944,7 @@
 \XeTeXinterchartoks \g_@@_non_CJK_Punct_class \g_@@_Opening_RightHalf_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \exp_args:Nx \@@_add_shrinkable_glue:n
       {
@@ -924,6 +969,7 @@
   {
     \@@_allowbreak:
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
   }
 
@@ -938,6 +984,7 @@
 \XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_CJK_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
   }
 
@@ -949,6 +996,7 @@
 \XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_Closing_LeftHalf_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \@@_set_current_punct_width_ratio:
     \@@_preprocess_closing_punct:nN { }
@@ -962,6 +1010,7 @@
 \XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_Closing_MiddleHalf_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \@@_set_current_punct_width_ratio:
     \@@_preprocess_closing_punct:nN
@@ -989,6 +1038,7 @@
 \XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_Closing_Full_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
   }
 
@@ -1000,6 +1050,7 @@
 \XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_Opening_RightHalf_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \group_begin: \exp_args:Nc \group_end:
       {
@@ -1017,6 +1068,7 @@
 \XeTeXinterchartoks \e@alloc@intercharclass@top \g_@@_Opening_Full_class
   {
     \c_group_begin_token
+    \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
   }
 
