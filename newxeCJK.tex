@@ -20,11 +20,11 @@
           { l_@@_CJK_ #1 family _tl }
       }
 % For ltfssini.dtx 2020/01/11 v3.1f or later, until 2020/08/24 v3.2c
-    \tl_put_right:cx { @ #1 familyhook }
-      { \use:c { CJK #1 family } }
+    \tl_put_right:co { @ #1 familyhook }
+      { \cs:w CJK #1 family \cs_end: }
 % For ltfssini.dtx 2020/08/24 v3.2c or later
-%    \exp_args:Nnx \AddToHook { #1 family }
-%      { \use:c { CJK #1 family } }
+%    \exp_args:Nno \AddToHook { #1 family }
+%      { \cs:w CJK #1 family \cs_end: }
   }
 
 \clist_map_inline:nn
@@ -32,6 +32,45 @@
     rm ; main ,
     sf ; sans ,
     tt ; mono
+  }
+  { \@@_tmp:w #1 \q_stop }
+
+\cs_set:Npn \@@_tmp:w #1 ; #2 \q_stop
+  {
+    \exp_args:Nc \NewDocumentCommand { #1 CJKfontfamily }
+      { m O{} m O{} }
+      {
+        #2 ##1
+          { }
+          {
+            \tl_set_eq:Nc \l_@@_CJK_fontfamily_tl
+              { l_@@_CJK_ \cs_to_str:N ##1 _tl }
+          }
+        \tl_clear_new:c { l_@@_CJK_ \cs_to_str:N ##1 _tl }
+        \exp_args:Nc \setfontfamily
+          { l_@@_CJK_ \cs_to_str:N ##1 _tl }
+          [ Script = CJK~Ideographic , ##2 ] {##3} [##4]
+        \tex_ignorespaces:D
+      }
+    \exp_args:Nc \NewDocumentCommand { #1 CJKfontface }
+      { m O{} m O{} }
+      {
+        \cs:w #1 CJKfontfamily \cs_end: ##1
+          [
+            BoldFont      = { } ,
+            ItalicFont    = { } ,
+            SmallCapsFont = { } ,
+            ##2
+          ] {##3} [##4]
+      }
+  }
+
+\clist_map_inline:nn
+  {
+    new     ; \NewDocumentCommand     ,
+    renew   ; \RenewDocumentCommand   ,
+    provide ; \ProvideDocumentCommand ,
+    set     ; \DeclareDocumentCommand
   }
   { \@@_tmp:w #1 \q_stop }
 

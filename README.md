@@ -16,10 +16,12 @@
 
 ## 向用户公开的命令 / Public commands
 
-### 字体设置
+### 字体的设置与使用
 
 - [x] `\setCJKmainfont`, `\setCJKsansfont`, `\setCJKmonofont`
 - [x] `\CJKrmfamily`, `\CJKsffamily`, `\CJKttfamily`
+- [x] `\newCJKfontfamily`, `\renewCJKfontfamily`, `\provideCJKfontfamily`, `\setCJKfontfamily`
+- [x] `\newCJKfontface`, `\renewCJKfontface`, `\provideCJKfontface`, `\setCJKfontface`
 
 ### 标点符号的排版样式
 
