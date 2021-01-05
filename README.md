@@ -48,9 +48,18 @@
 - [x] `\SetPunctKernWidthRatio{<decimal number>}`
 - [x] `\SetCJKCondensedRatio{<fraction>}`
 
+## 效果展示 / Demo
+
+<img src="demo.svg" alt="demo">
+
+## 等待实现的功能 / TODO
+
+- 完善 Boundary 类别和其它字符类别之间插入的 tokens
+- 支持独立设置标点符号字体、日文假名字体、韩文字体
+
 ## Copyright and License
 
-    Copyright 2020 Ruixi Zhang <ruixizhang42@gmail.com>
+    Copyright 2020-2021 Ruixi Zhang <ruixizhang42@gmail.com>
     
     This work may be distributed and/or modified under the
     conditions of the LaTeX Project Public License, either version 1.3c
