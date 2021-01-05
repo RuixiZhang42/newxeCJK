@@ -55,7 +55,7 @@
 ## 等待实现的功能 / TODO
 
 - 完善 Boundary 类别和其它字符类别之间插入的 tokens
-- 支持独立设置标点符号字体、日文假名字体、韩文字体
+- 支持独立设置标点符号字体、日语假名字体、韩语谚文字体
 
 ## Copyright and License
 
@@ -74,4 +74,5 @@
     The Current Maintainer of this work is Ruixi Zhang.
     
     This work consists of the files newxeCJK.tex,
+                                    demo.svg,
                                     README.md (this file)
