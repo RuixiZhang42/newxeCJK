@@ -75,7 +75,7 @@
   { \@@_tmp:w #1 \q_stop }
 
 \tl_new:N  \l_@@_CJKglue_tl
-\tl_set:Nn \l_@@_CJKglue_tl { 0em plus 0.0625em }
+\tl_set:Nn \l_@@_CJKglue_tl { 0em plus 1em / 16 }
 
 \tl_new:N  \l_@@_CJKecglue_tl
 \tl_set:Nn \l_@@_CJKecglue_tl { 2em plus 1em minus 1em / 10 }
@@ -295,7 +295,11 @@
   {
     \@@_insert_nobreak_CJKglue:
     \@@_set_current_punct_width_ratio:
-    \@@_preprocess_closing_punct:nN { }
+    \@@_preprocess_closing_punct:nN
+      {
+        \bool_if:NT \l_@@_hang_current_punct_bool
+          \tex_unskip:D
+      }
   }
 
 \XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_CJK_class
