@@ -74,6 +74,280 @@
   }
   { \@@_tmp:w #1 \q_stop }
 
+\newXeTeXintercharclass \g_@@_CJK_class
+\newXeTeXintercharclass \g_@@_Closing_LeftHalf_class
+\newXeTeXintercharclass \g_@@_Closing_MiddleHalf_class
+\newXeTeXintercharclass \g_@@_Closing_Full_class
+\newXeTeXintercharclass \g_@@_Opening_RightHalf_class
+\newXeTeXintercharclass \g_@@_Opening_Full_class
+\newXeTeXintercharclass \g_@@_non_CJK_Punct_class
+
+% Manipulating inter-char token registers
+
+\cs_new_eq:NN \@@_interchartoks_set:NNn
+    \tex_XeTeXinterchartoks:D
+\cs_new_protected:Npn \@@_interchartoks_set:nNn #1
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set:Nnn #1#2
+  {
+    \tex_XeTeXinterchartoks:D
+      \exp_after:wN #1
+      \cs:w g_@@_ #2 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set:nnn #1#2
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #2 _class \cs_end:
+  }
+
+\cs_new_protected:Npn \@@_interchartoks_set_eq:NNNN #1#2
+  {
+    \tex_XeTeXinterchartoks:D #1 #2
+    \tex_XeTeXinterchartoks:D
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:NNnN #1#2#3
+  {
+    \tex_XeTeXinterchartoks:D #1 #2
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #3 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:NNNn #1#2#3#4
+  {
+    \tex_XeTeXinterchartoks:D #1 #2
+    \tex_XeTeXinterchartoks:D
+      \exp_after:wN #3
+      \cs:w g_@@_ #4 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:NNnn #1#2#3#4
+  {
+    \tex_XeTeXinterchartoks:D #1 #2
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #3 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #4 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:nNNN #1#2
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \cs_end:
+      #2
+    \tex_XeTeXinterchartoks:D
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:nNnN #1#2#3
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \cs_end:
+      #2
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #3 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:nNNn #1#2#3#4
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \cs_end:
+      #2
+    \tex_XeTeXinterchartoks:D
+      \exp_after:wN #3
+      \cs:w g_@@_ #4 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:nNnn #1#2#3#4
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \cs_end:
+      #2
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #3 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #4 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:NnNN #1#2
+  {
+    \tex_XeTeXinterchartoks:D
+      \exp_after:wN #1
+      \cs:w g_@@_ #2 _class \cs_end:
+    \tex_XeTeXinterchartoks:D
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:NnnN #1#2#3
+  {
+    \tex_XeTeXinterchartoks:D
+      \exp_after:wN #1
+      \cs:w g_@@_ #2 _class \cs_end:
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #3 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:NnNn #1#2#3#4
+  {
+    \tex_XeTeXinterchartoks:D
+      \exp_after:wN #1
+      \cs:w g_@@_ #2 _class \cs_end:
+    \tex_XeTeXinterchartoks:D
+      \exp_after:wN #3
+      \cs:w g_@@_ #4 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:Nnnn #1#2#3#4
+  {
+    \tex_XeTeXinterchartoks:D
+      \exp_after:wN #1
+      \cs:w g_@@_ #2 _class \cs_end:
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #3 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #4 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:nnNN #1#2
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #2 _class \cs_end:
+    \tex_XeTeXinterchartoks:D
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:nnnN #1#2#3
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #2 _class \cs_end:
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #3 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:nnNn #1#2#3#4
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #2 _class \cs_end:
+    \tex_XeTeXinterchartoks:D
+      \exp_after:wN #3
+      \cs:w g_@@_ #4 _class \cs_end:
+  }
+\cs_new_protected:Npn \@@_interchartoks_set_eq:nnnn #1#2#3#4
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #2 _class \cs_end:
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #3 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #4 _class \cs_end:
+  }
+
+\cs_new_protected:Npn \@@_interchartoks_clear:NN #1#2
+  {
+    \tex_XeTeXinterchartoks:D #1 #2 { }
+  }
+\cs_new_protected:Npn \@@_interchartoks_clear:nN #1#2
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \cs_end:
+      #2
+      { }
+  }
+\cs_new_protected:Npn \@@_interchartoks_clear:Nn #1#2
+  {
+    \tex_XeTeXinterchartoks:D
+      \exp_after:wN #1
+      \cs:w g_@@_ #2 _class \cs_end:
+      { }
+  }
+\cs_new_protected:Npn \@@_interchartoks_clear:nn #1#2
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #2 _class \cs_end:
+      { }
+  }
+
+\cs_new_protected:Npn \@@_interchartoks_put_left:NNn #1#2
+  {
+    \exp_after:wN \@@_interchartoks_put_left_aux:NNw
+      \exp_after:wN #1
+      \exp_after:wN #2
+      \exp_after:wN \q_nil
+      \tex_the:D \tex_XeTeXinterchartoks:D #1 #2 \q_stop
+  }
+\cs_new_protected:Npn \@@_interchartoks_put_left:nNn #1#2
+  {
+    \exp_after:wN \@@_interchartoks_put_left_aux:NNw
+      \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+      \exp_after:wN #2
+      \exp_after:wN \q_nil
+      \tex_the:D \tex_XeTeXinterchartoks:D
+        \cs:w g_@@_ #1 _class \cs_end:
+        #2
+      \q_stop
+  }
+\cs_new_protected:Npn \@@_interchartoks_put_left:Nnn #1#2
+  {
+    \exp_after:wN \@@_interchartoks_put_left_aux:NNw
+      \exp_after:wN #1
+      \cs:w g_@@_ #2 _class \exp_after:wN \cs_end:
+      \exp_after:wN \q_nil
+      \tex_the:D \tex_XeTeXinterchartoks:D
+        \exp_after:wN #1
+        \cs:w g_@@_ #2 _class \cs_end:
+      \q_stop
+  }
+\cs_new_protected:Npn \@@_interchartoks_put_left:nnn #1#2
+  {
+    \exp_after:wN \@@_interchartoks_put_left_aux:NNw
+      \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #2 _class \exp_after:wN \cs_end:
+      \exp_after:wN \q_nil
+      \tex_the:D \tex_XeTeXinterchartoks:D
+        \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+        \cs:w g_@@_ #2 _class \cs_end:
+      \q_stop
+  }
+\cs_new_protected:Npn \@@_interchartoks_put_left_aux:NNw
+  #1#2 #3 \q_stop #4
+  {
+    \tex_XeTeXinterchartoks:D #1 #2
+      \exp_after:wN { \use_i:nn {#4} #3 }
+  }
+
+\cs_new_protected:Npn \@@_interchartoks_put_right:NNn #1#2#3
+  {
+    \tex_XeTeXinterchartoks:D #1 #2
+      \exp_after:wN {
+        \tex_the:D \tex_XeTeXinterchartoks:D #1 #2
+        #3
+      }
+  }
+\cs_new_protected:Npn \@@_interchartoks_put_right:nNn #1#2#3
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \cs_end:
+      #2
+      \exp_after:wN {
+        \tex_the:D \tex_XeTeXinterchartoks:D
+          \cs:w g_@@_ #1 _class \cs_end:
+          #2
+        #3
+      }
+  }
+\cs_new_protected:Npn \@@_interchartoks_put_right:Nnn #1#2#3
+  {
+    \tex_XeTeXinterchartoks:D
+      \exp_after:wN #1
+      \cs:w g_@@_ #2 _class \cs_end:
+      \exp_after:wN {
+        \tex_the:D \tex_XeTeXinterchartoks:D
+          \exp_after:wN #1
+          \cs:w g_@@_ #2 _class \cs_end:
+        #3
+      }
+  }
+\cs_new_protected:Npn \@@_interchartoks_put_right:nnn #1#2#3
+  {
+    \tex_XeTeXinterchartoks:D
+      \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+      \cs:w g_@@_ #2 _class \cs_end:
+      \exp_after:wN {
+        \tex_the:D \tex_XeTeXinterchartoks:D
+          \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+          \cs:w g_@@_ #2 _class \cs_end:
+        #3
+      }
+  }
+
 \tl_new:N  \l_@@_CJKglue_tl
 \tl_set:Nn \l_@@_CJKglue_tl { 0em plus 1em / 16 }
 
@@ -181,16 +455,6 @@
 
 \clist_new:N \l_@@_keep_blank_punct_clist
 
-\XeTeXinterchartokenstate = \c_one_int
-
-\newXeTeXintercharclass \g_@@_CJK_class
-\newXeTeXintercharclass \g_@@_Closing_LeftHalf_class
-\newXeTeXintercharclass \g_@@_Closing_MiddleHalf_class
-\newXeTeXintercharclass \g_@@_Closing_Full_class
-\newXeTeXintercharclass \g_@@_Opening_RightHalf_class
-\newXeTeXintercharclass \g_@@_Opening_Full_class
-\newXeTeXintercharclass \g_@@_non_CJK_Punct_class
-
 \cs_new_protected:Npn \@@_nobreak:
   { \tex_penalty:D 10 000 ~ }
 
@@ -205,6 +469,9 @@
 
 \cs_new_protected:Npn \@@_insert_CJKecglue:
   { \skip_horizontal:n { \l_@@_CJKecglue_tl } }
+
+\cs_new_protected:Npn \@@_insert_nobreak_CJKecglue:
+  { \@@_nobreak: \skip_horizontal:n { \l_@@_CJKecglue_tl } }
 
 \cs_new_protected:Npn \@@_remove_blank:n #1
   {
@@ -1556,6 +1823,10 @@
         "FF1B
       }
   }
+
+% Turning on the inter-char token mechanism. Enjoy!
+
+\tex_XeTeXinterchartokenstate:D \c_one_int
 
 \ExplSyntaxOff
 \makeatother
