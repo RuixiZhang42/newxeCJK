@@ -44,11 +44,11 @@
           { }
           {
             \tl_set_eq:Nc \l_@@_CJK_fontfamily_tl
-              { l_@@_CJK_ \cs_to_str:N ##1 _tl }
+              { l_@@_CJK_! \cs_to_str:N ##1 !_tl }
           }
-        \tl_clear_new:c { l_@@_CJK_ \cs_to_str:N ##1 _tl }
+        \tl_clear_new:c { l_@@_CJK_! \cs_to_str:N ##1 !_tl }
         \exp_args:Nc \setfontfamily
-          { l_@@_CJK_ \cs_to_str:N ##1 _tl }
+          { l_@@_CJK_! \cs_to_str:N ##1 !_tl }
           [ Script = CJK~Ideographic , ##2 ] {##3} [##4]
         \tex_ignorespaces:D
       }
@@ -74,13 +74,48 @@
   }
   { \@@_tmp:w #1 \q_stop }
 
-\newXeTeXintercharclass \g_@@_CJK_class
-\newXeTeXintercharclass \g_@@_Closing_LeftHalf_class
-\newXeTeXintercharclass \g_@@_Closing_MiddleHalf_class
-\newXeTeXintercharclass \g_@@_Closing_Full_class
-\newXeTeXintercharclass \g_@@_Opening_RightHalf_class
-\newXeTeXintercharclass \g_@@_Opening_Full_class
-\newXeTeXintercharclass \g_@@_non_CJK_Punct_class
+\msg_new:nnnn { newxeCJK } { charclass-already-defined }
+  { XeTeX~charclass~#1~already~defined. }
+  {
+    newxeCJK~has~been~asked~to~create~a~new~charclass~'#1',\\
+    but~this~name~has~already~been~used~elsewhere.
+  }
+\msg_new:nnnn { newxeCJK } { charclass-not-defined }
+  { XeTeX~charclass~#1~undefined. }
+  {
+    newxeCJK~has~been~asked~to~use~a~charclass~'#1',\\
+    but~this~has~not~been~defined~yet.
+  }
+\cs_new_protected:Npn \@@_chk_if_exist_charclass:n #1
+  {
+    \cs_if_exist:cF { g_@@_ #1 _class }
+      {
+        \msg_error:nnx { newxeCJK } { charclass-not-defined }
+          { \tl_to_str:n {#1} }
+      }
+  }
+
+% Creating new charclasses
+
+\cs_new_protected:Npn \@@_charclass_new:n #1
+  {
+    \cs_if_exist:cTF { g_@@_ #1 _class }
+      {
+        \msg_error:nnx { newxeCJK } { charclass-already-defined }
+          { \tl_to_str:n {#1} }
+      }
+      {
+        \exp_args:Nc \newXeTeXintercharclass
+          { g_@@_ #1 _class }
+      }
+  }
+\@@_charclass_new:n { CJK }
+\@@_charclass_new:n { Closing_LeftHalf }
+\@@_charclass_new:n { Closing_MiddleHalf }
+\@@_charclass_new:n { Closing_Full }
+\@@_charclass_new:n { Opening_RightHalf }
+\@@_charclass_new:n { Opening_Full }
+\@@_charclass_new:n { non_CJK_Punct }
 
 % Manipulating inter-char token registers
 
@@ -88,17 +123,21 @@
     \tex_XeTeXinterchartoks:D
 \cs_new_protected:Npn \@@_interchartoks_set:nNn #1
   {
+    \@@_chk_if_exist_charclass:n {#1}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \cs_end:
   }
 \cs_new_protected:Npn \@@_interchartoks_set:Nnn #1#2
   {
+    \@@_chk_if_exist_charclass:n {#2}
     \tex_XeTeXinterchartoks:D
       \exp_after:wN #1
       \cs:w g_@@_ #2 _class \cs_end:
   }
 \cs_new_protected:Npn \@@_interchartoks_set:nnn #1#2
   {
+    \@@_chk_if_exist_charclass:n {#1}
+    \@@_chk_if_exist_charclass:n {#2}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
       \cs:w g_@@_ #2 _class \cs_end:
@@ -111,12 +150,14 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:NNnN #1#2#3
   {
+    \@@_chk_if_exist_charclass:n {#3}
     \tex_XeTeXinterchartoks:D #1 #2
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #3 _class \cs_end:
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:NNNn #1#2#3#4
   {
+    \@@_chk_if_exist_charclass:n {#4}
     \tex_XeTeXinterchartoks:D #1 #2
     \tex_XeTeXinterchartoks:D
       \exp_after:wN #3
@@ -124,6 +165,8 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:NNnn #1#2#3#4
   {
+    \@@_chk_if_exist_charclass:n {#3}
+    \@@_chk_if_exist_charclass:n {#4}
     \tex_XeTeXinterchartoks:D #1 #2
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #3 _class \exp_after:wN \cs_end:
@@ -131,6 +174,7 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:nNNN #1#2
   {
+    \@@_chk_if_exist_charclass:n {#1}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \cs_end:
       #2
@@ -138,6 +182,8 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:nNnN #1#2#3
   {
+    \@@_chk_if_exist_charclass:n {#1}
+    \@@_chk_if_exist_charclass:n {#3}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \cs_end:
       #2
@@ -146,6 +192,8 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:nNNn #1#2#3#4
   {
+    \@@_chk_if_exist_charclass:n {#1}
+    \@@_chk_if_exist_charclass:n {#4}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \cs_end:
       #2
@@ -155,6 +203,9 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:nNnn #1#2#3#4
   {
+    \@@_chk_if_exist_charclass:n {#1}
+    \@@_chk_if_exist_charclass:n {#3}
+    \@@_chk_if_exist_charclass:n {#4}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \cs_end:
       #2
@@ -164,6 +215,7 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:NnNN #1#2
   {
+    \@@_chk_if_exist_charclass:n {#2}
     \tex_XeTeXinterchartoks:D
       \exp_after:wN #1
       \cs:w g_@@_ #2 _class \cs_end:
@@ -171,6 +223,8 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:NnnN #1#2#3
   {
+    \@@_chk_if_exist_charclass:n {#2}
+    \@@_chk_if_exist_charclass:n {#3}
     \tex_XeTeXinterchartoks:D
       \exp_after:wN #1
       \cs:w g_@@_ #2 _class \cs_end:
@@ -179,6 +233,8 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:NnNn #1#2#3#4
   {
+    \@@_chk_if_exist_charclass:n {#2}
+    \@@_chk_if_exist_charclass:n {#4}
     \tex_XeTeXinterchartoks:D
       \exp_after:wN #1
       \cs:w g_@@_ #2 _class \cs_end:
@@ -188,6 +244,9 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:Nnnn #1#2#3#4
   {
+    \@@_chk_if_exist_charclass:n {#2}
+    \@@_chk_if_exist_charclass:n {#3}
+    \@@_chk_if_exist_charclass:n {#4}
     \tex_XeTeXinterchartoks:D
       \exp_after:wN #1
       \cs:w g_@@_ #2 _class \cs_end:
@@ -197,6 +256,8 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:nnNN #1#2
   {
+    \@@_chk_if_exist_charclass:n {#1}
+    \@@_chk_if_exist_charclass:n {#2}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
       \cs:w g_@@_ #2 _class \cs_end:
@@ -204,6 +265,9 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:nnnN #1#2#3
   {
+    \@@_chk_if_exist_charclass:n {#1}
+    \@@_chk_if_exist_charclass:n {#2}
+    \@@_chk_if_exist_charclass:n {#3}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
       \cs:w g_@@_ #2 _class \cs_end:
@@ -212,6 +276,9 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:nnNn #1#2#3#4
   {
+    \@@_chk_if_exist_charclass:n {#1}
+    \@@_chk_if_exist_charclass:n {#2}
+    \@@_chk_if_exist_charclass:n {#4}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
       \cs:w g_@@_ #2 _class \cs_end:
@@ -221,6 +288,10 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_set_eq:nnnn #1#2#3#4
   {
+    \@@_chk_if_exist_charclass:n {#1}
+    \@@_chk_if_exist_charclass:n {#2}
+    \@@_chk_if_exist_charclass:n {#3}
+    \@@_chk_if_exist_charclass:n {#4}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
       \cs:w g_@@_ #2 _class \cs_end:
@@ -235,6 +306,7 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_clear:nN #1#2
   {
+    \@@_chk_if_exist_charclass:n {#1}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \cs_end:
       #2
@@ -242,6 +314,7 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_clear:Nn #1#2
   {
+    \@@_chk_if_exist_charclass:n {#2}
     \tex_XeTeXinterchartoks:D
       \exp_after:wN #1
       \cs:w g_@@_ #2 _class \cs_end:
@@ -249,6 +322,8 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_clear:nn #1#2
   {
+    \@@_chk_if_exist_charclass:n {#1}
+    \@@_chk_if_exist_charclass:n {#2}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
       \cs:w g_@@_ #2 _class \cs_end:
@@ -265,6 +340,7 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_put_left:nNn #1#2
   {
+    \@@_chk_if_exist_charclass:n {#1}
     \exp_after:wN \@@_interchartoks_put_left_aux:NNw
       \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
       \exp_after:wN #2
@@ -276,6 +352,7 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_put_left:Nnn #1#2
   {
+    \@@_chk_if_exist_charclass:n {#2}
     \exp_after:wN \@@_interchartoks_put_left_aux:NNw
       \exp_after:wN #1
       \cs:w g_@@_ #2 _class \exp_after:wN \cs_end:
@@ -287,6 +364,8 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_put_left:nnn #1#2
   {
+    \@@_chk_if_exist_charclass:n {#1}
+    \@@_chk_if_exist_charclass:n {#2}
     \exp_after:wN \@@_interchartoks_put_left_aux:NNw
       \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
       \cs:w g_@@_ #2 _class \exp_after:wN \cs_end:
@@ -313,6 +392,7 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_put_right:nNn #1#2#3
   {
+    \@@_chk_if_exist_charclass:n {#1}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \cs_end:
       #2
@@ -325,6 +405,7 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_put_right:Nnn #1#2#3
   {
+    \@@_chk_if_exist_charclass:n {#2}
     \tex_XeTeXinterchartoks:D
       \exp_after:wN #1
       \cs:w g_@@_ #2 _class \cs_end:
@@ -337,6 +418,8 @@
   }
 \cs_new_protected:Npn \@@_interchartoks_put_right:nnn #1#2#3
   {
+    \@@_chk_if_exist_charclass:n {#1}
+    \@@_chk_if_exist_charclass:n {#2}
     \tex_XeTeXinterchartoks:D
       \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
       \cs:w g_@@_ #2 _class \cs_end:
@@ -440,7 +523,8 @@
   {
     \str_if_in:nnTF {#1} { . }
       {
-        \msg_error:nnn { newxeCJK } { decimal-not-allowed } {#1}
+        \msg_error:nnx { newxeCJK } { decimal-not-allowed }
+          { \tl_to_str:n {#1} }
       }
       {
         \tl_set:Nn \l_@@_CJK_condensed_ratio_tl {#1}
@@ -1463,7 +1547,7 @@
   }
 
 \msg_new:nnnn { newxeCJK } { invalid-range }
-  { The~start~index~(#1)~is~greater~than~the~end~index~(#2). }
+  { The~start~index~#1~is~greater~than~the~end~index~#2. }
   {
     A~valid~range~should~have~its~start~index~
     less~than~or~equal~to~its~end~index.
@@ -1477,7 +1561,8 @@
       {
         \int_compare:nNnTF \l_tmpa_int > {#3}
           {
-            \msg_error:nnnn { newxeCJK } { invalid-range } {#2} {#3}
+            \msg_error:nnxx { newxeCJK } { invalid-range }
+              { \tl_to_str:n {#2} } { \tl_to_str:n {#3} }
           }
           {
             \int_do_until:nNnn \l_tmpa_int > {#3}
