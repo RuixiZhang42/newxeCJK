@@ -50,7 +50,13 @@
 
 ## 效果展示 / Demo
 
-<img src="demo.svg" alt="demo">
+### 本地化
+
+<img src="demo/demo-language.svg" alt="demo-language">
+
+### 疏排
+
+<img src="demo/demo-tracking.svg" alt="demo-tracking">
 
 ## 等待实现的功能 / TODO
 
