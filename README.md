@@ -50,6 +50,17 @@
 
 ## 效果展示 / Demo
 
+The text samples in the following demo files were adapted from
+https://zh.wikipedia.org/zh-cn/TeX,
+https://zh.wikipedia.org/zh-tw/TeX,
+and
+https://ja.wikipedia.org/wiki/TeX.
+All original texts were licensed under CC&nbsp;BY&#x2011;SA&nbsp;3.0.
+Modifications to these texts were made to exhibit typographic adjustments
+when typesetting East Asian languages.
+The demo files themselves (in SVG format) are licensed under
+CC&nbsp;BY&#x2011;SA&nbsp;4.0.
+
 ### 本地化
 
 <img src="demo/demo-language.svg" alt="demo-language">
@@ -64,6 +75,10 @@
 - 支持独立设置标点符号字体、日语假名字体、韩语谚文字体
 
 ## Copyright and License
+
+The [demo files](demo), which are the non-software parts of this project,
+are licensed under CC&nbsp;BY&#x2011;SA&nbsp;4.0.
+The software parts of this project are licensed under LPPL&nbsp;1.3c.
 
     Copyright 2020-2021 Ruixi Zhang <ruixizhang42@gmail.com>
     
@@ -80,5 +95,4 @@
     The Current Maintainer of this work is Ruixi Zhang.
     
     This work consists of the files newxeCJK.tex,
-                                    demo.svg,
                                     README.md (this file)
