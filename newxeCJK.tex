@@ -1543,7 +1543,21 @@
 \cs_new_protected:Npn \@@_assign_charclass_to_charcode:Nn #1#2
   {
     \clist_map_inline:nn {#2}
-      { \@@_assign_charclass_to_charcode_aux:Nw #1##1 - - \q_stop }
+      {
+        \exp_after:wN \@@_assign_charclass_to_charcode_aux:Nw
+          \exp_after:wN #1
+          \tl_to_str:n {##1} - - \q_stop
+      }
+  }
+\cs_new_protected:Npn \@@_assign_charclass_to_charcode:nn #1#2
+  {
+    \@@_chk_if_exist_charclass:n {#1}
+    \clist_map_inline:nn {#2}
+      {
+        \exp_after:wN \@@_assign_charclass_to_charcode_aux:Nw
+          \cs:w g_@@_ #1 _class \exp_after:wN \cs_end:
+          \tl_to_str:n {##1} - - \q_stop
+      }
   }
 
 \msg_new:nnnn { newxeCJK } { invalid-range }
@@ -1553,7 +1567,7 @@
     less~than~or~equal~to~its~end~index.
   }
 \cs_new_protected:Npn \@@_assign_charclass_to_charcode_aux:Nw
-  #1#2 - #3 - #4 \q_stop
+  #1 #2 - #3 - #4 \q_stop
   {
     \int_set:Nn \l_tmpa_int {#2}
     \tl_if_empty:nTF {#3}
@@ -1574,7 +1588,7 @@
       }
   }
 
-\@@_assign_charclass_to_charcode:Nn \g_@@_CJK_class
+\@@_assign_charclass_to_charcode:nn { CJK }
   {
 % Spacing Modifier Letters (only U+02EA and U+02EB)
 %    "02C9 , "02CA , "02C7 , "02CB , "02D9 ,
@@ -1701,7 +1715,7 @@
     "30000 - "3134F
   }
 
-\@@_assign_charclass_to_charcode:Nn \g_@@_non_CJK_Punct_class
+\@@_assign_charclass_to_charcode:nn { non_CJK_Punct }
   {
     "21 - "2F ,
     "3A - "40 ,
@@ -1723,7 +1737,7 @@
 \cs_new_protected:Npn \ChineseSimplifiedH
   {
     \clist_clear:N \l_@@_keep_blank_punct_clist
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_LeftHalf_class
+    \@@_assign_charclass_to_charcode:nn { Closing_LeftHalf }
       {
 % 简体中文与英文共用的引号
         "2019 , "201D ,
@@ -1742,7 +1756,7 @@
 % 日文音调符号，不允许出现在行首
         "309B , "309C
       }
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_MiddleHalf_class
+    \@@_assign_charclass_to_charcode:nn { Closing_MiddleHalf }
       {
 % 港台间隔号
         "2027 ,
@@ -1754,7 +1768,7 @@
 % 直排 En Dash
         "FE32
       }
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+    \@@_assign_charclass_to_charcode:nn { Closing_Full }
       {
 % 中西共用的标点
         "2014 , "2015 , "2025 , "2026 ,
@@ -1795,7 +1809,7 @@
 % 半宽日文音调符号，不允许出现在行首
         "FF70 , "FF9E , "FF9F
       }
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Opening_RightHalf_class
+    \@@_assign_charclass_to_charcode:nn { Opening_RightHalf }
       {
 % 简体中文与英文共用的引号
         "2018 , "201C ,
@@ -1807,7 +1821,7 @@
         "FE17 , "FE35 , "FE37 , "FE39 , "FE3B ,
         "FE3D , "FE3F , "FE41 , "FE43 , "FE47
       }
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Opening_Full_class
+    \@@_assign_charclass_to_charcode:nn { Opening_Full }
       {
         "FF03 , "FF04 , "FFE1 , "FFE5 , "FFE6 ,
 % Small Form Variants
@@ -1823,7 +1837,7 @@
 \cs_new_protected:Npn \ChineseSimplifiedV
   {
     \ChineseSimplifiedH
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+    \@@_assign_charclass_to_charcode:nn { Closing_Full }
       {
         "FF01 , "FF1A , "FF1B , "FF1F
       }
@@ -1832,7 +1846,7 @@
 % 繁体中文/日文的这些标点可以来自英文字体
 \cs_new_protected:Npn \@@_assign_non_CJK_Punct_class:
   {
-    \@@_assign_charclass_to_charcode:Nn \g_@@_non_CJK_Punct_class
+    \@@_assign_charclass_to_charcode:nn { non_CJK_Punct }
       {
         "2019 , "201D ,
         "00B7 ,
@@ -1850,13 +1864,13 @@
         "FF1A , "FF1B ,
         "FE10 , "FE11 , "FE12
       }
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_MiddleHalf_class
+    \@@_assign_charclass_to_charcode:nn { Closing_MiddleHalf }
       {
         "3001 , "3002 , "FF01 , "FF0C , "FF0E ,
         "FF1A , "FF1B ,
         "FE10 , "FE11 , "FE12
       }
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+    \@@_assign_charclass_to_charcode:nn { Closing_Full }
       {
         "FF1F
       }
@@ -1872,12 +1886,12 @@
         "3001 , "3002 , "FF0C , "FF0E ,
         "FE10 , "FE11 , "FE12
       }
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_MiddleHalf_class
+    \@@_assign_charclass_to_charcode:nn { Closing_MiddleHalf }
       {
         "3001 , "3002 , "FF0C , "FF0E ,
         "FE10 , "FE11 , "FE12
       }
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+    \@@_assign_charclass_to_charcode:nn { Closing_Full }
       {
         "FF01 , "FF1A , "FF1B , "FF1F
       }
@@ -1891,11 +1905,11 @@
       {
         "3002 , "FF0E , "FE12
       }
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_MiddleHalf_class
+    \@@_assign_charclass_to_charcode:nn { Closing_MiddleHalf }
       {
         "FF1A , "FF1B
       }
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+    \@@_assign_charclass_to_charcode:nn { Closing_Full }
       {
         "FF01 , "FF1F
       }
@@ -1905,7 +1919,7 @@
 \cs_new_protected:Npn \JapaneseV
   {
     \JapaneseH
-    \@@_assign_charclass_to_charcode:Nn \g_@@_Closing_Full_class
+    \@@_assign_charclass_to_charcode:nn { Closing_Full }
       {
         "FF1B
       }
