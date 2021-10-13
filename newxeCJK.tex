@@ -473,9 +473,7 @@
 \fp_new:N \l_@@_punct_kern_width_ratio_fp
 \cs_new_protected:Npn \SetPunctKernWidthRatio #1
   {
-    \exp_args:NNx \fp_set:Nn
-      \l_@@_punct_kern_width_ratio_fp
-      { \fp_abs:n {#1} }
+    \fp_set:Nn \l_@@_punct_kern_width_ratio_fp {#1}
   }
 
 \cs_new_protected:Npn \quanjiaostyle
@@ -865,7 +863,7 @@
 \XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_Opening_RightHalf_class
   {
     \@@_remove_blank:n
-      { \fp_use:N \l_@@_punct_kern_width_ratio_fp em }
+      { - \fp_use:N \l_@@_punct_kern_width_ratio_fp em }
   }
 
 \XeTeXinterchartoks \g_@@_Opening_Full_class \g_@@_Opening_RightHalf_class
@@ -885,7 +883,7 @@
 \XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_Closing_LeftHalf_class
   {
     \@@_remove_blank:n
-      { \fp_use:N \l_@@_punct_kern_width_ratio_fp em }
+      { - \fp_use:N \l_@@_punct_kern_width_ratio_fp em }
     \@@_preprocess_closing_punct:nN { }
   }
 
