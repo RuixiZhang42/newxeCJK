@@ -508,6 +508,13 @@
     \SetPunctKernWidthRatio { 0 }
   }
 
+\tl_new:N \l_@@_punct_offset_dim_tl
+\cs_new_protected:Npn \SetPunctOffsetDim #1
+  {
+    \tl_set:Nn \l_@@_punct_offset_dim_tl {#1}
+  }
+\SetPunctOffsetDim { 0em }
+
 \tl_new:N \l_@@_CJK_condensed_ratio_tl
 \msg_new:nnnn { newxeCJK } { decimal-not-allowed }
   { The~expression~'#1'~must~be~converted~into~a~fraction. }
@@ -646,11 +653,15 @@
       {
         \bool_if:NT \l_@@_hang_current_punct_bool
           \tex_unskip:D
+        \@@_remove_blank:n
+          { \l_@@_punct_offset_dim_tl }
       }
   }
 
 \XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_CJK_class
   {
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
     \bool_if:NT \l_@@_hang_current_punct_bool
@@ -739,10 +750,16 @@
       }
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
   }
 
 \XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_CJK_class
-  { \@@_insert_nobreak_CJKglue: }
+  {
+    \@@_remove_blank:n
+      { \l_@@_punct_offset_dim_tl }
+    \@@_insert_nobreak_CJKglue:
+  }
 
 \XeTeXinterchartoks \g_@@_CJK_class \g_@@_Opening_Full_class
   { \@@_insert_CJKglue: }
@@ -754,6 +771,8 @@
 
 \XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_Opening_RightHalf_class
   {
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
     \bool_if:NT \l_@@_hang_current_punct_bool
@@ -778,6 +797,8 @@
       { \@@_allowbreak: }
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
   }
 
 \XeTeXinterchartoks \g_@@_Closing_MiddleHalf_class \g_@@_Opening_RightHalf_class
@@ -799,6 +820,8 @@
       { \@@_allowbreak: }
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
   }
 
 \XeTeXinterchartoks \g_@@_Closing_Full_class \g_@@_Opening_RightHalf_class
@@ -806,10 +829,14 @@
     \@@_allowbreak:
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
   }
 
 \XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_Opening_Full_class
   {
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
     \bool_if:NT \l_@@_hang_current_punct_bool
@@ -868,10 +895,15 @@
   {
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
   }
 
 \XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_Opening_Full_class
-  { }
+  {
+    \@@_remove_blank:n
+      { \l_@@_punct_offset_dim_tl }
+  }
 
 \XeTeXinterchartoks \g_@@_Opening_Full_class \g_@@_Opening_Full_class
   { }
@@ -900,17 +932,27 @@
           \c_zero_fp em
       }
     \@@_set_current_punct_width_ratio:
-    \@@_preprocess_closing_punct:nN { }
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_remove_blank:n
+          { \l_@@_punct_offset_dim_tl }
+      }
   }
 
 \XeTeXinterchartoks \g_@@_Closing_Full_class \g_@@_Closing_LeftHalf_class
   {
     \@@_set_current_punct_width_ratio:
-    \@@_preprocess_closing_punct:nN { }
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_remove_blank:n
+          { \l_@@_punct_offset_dim_tl }
+      }
   }
 
 \XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_Closing_MiddleHalf_class
   {
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
     \@@_preprocess_closing_punct:nN
@@ -974,6 +1016,8 @@
 \XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_Closing_Full_class
   {
     \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
+    \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
   }
 
@@ -1000,18 +1044,30 @@
 
 \XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_Closing_LeftHalf_class
   {
+    \@@_remove_blank:n
+      { \l_@@_punct_offset_dim_tl }
     \@@_set_current_punct_width_ratio:
-    \@@_preprocess_closing_punct:nN { }
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_remove_blank:n
+          { \l_@@_punct_offset_dim_tl }
+      }
   }
 
 \XeTeXinterchartoks \g_@@_Opening_Full_class \g_@@_Closing_LeftHalf_class
   {
     \@@_set_current_punct_width_ratio:
-    \@@_preprocess_closing_punct:nN { }
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_remove_blank:n
+          { \l_@@_punct_offset_dim_tl }
+      }
   }
 
 \XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_Closing_MiddleHalf_class
   {
+    \@@_remove_blank:n
+      { \l_@@_punct_offset_dim_tl }
     \@@_set_current_punct_width_ratio:
     \@@_preprocess_closing_punct:nN
       {
@@ -1051,7 +1107,10 @@
   }
 
 \XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_Closing_Full_class
-  { }
+  {
+    \@@_remove_blank:n
+      { \l_@@_punct_offset_dim_tl }
+  }
 
 \XeTeXinterchartoks \g_@@_Opening_Full_class \g_@@_Closing_Full_class
   { }
@@ -1097,11 +1156,17 @@
     \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \@@_set_current_punct_width_ratio:
-    \@@_preprocess_closing_punct:nN { }
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_remove_blank:n
+          { \l_@@_punct_offset_dim_tl }
+      }
   }
 
 \XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \c_zero_int
   {
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
     \bool_if:NT \l_@@_hang_current_punct_bool
@@ -1201,10 +1266,14 @@
       }
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
   }
 
 \XeTeXinterchartoks \g_@@_Opening_RightHalf_class \c_zero_int
   {
+    \@@_remove_blank:n
+      { \l_@@_punct_offset_dim_tl }
     \c_group_end_token
     \@@_nobreak: \skip_horizontal:N \c_zero_skip
   }
@@ -1243,11 +1312,17 @@
     \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \@@_set_current_punct_width_ratio:
-    \@@_preprocess_closing_punct:nN { }
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_remove_blank:n
+          { \l_@@_punct_offset_dim_tl }
+      }
   }
 
 \XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \g_@@_non_CJK_Punct_class
   {
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
     \bool_if:NT \l_@@_hang_current_punct_bool
@@ -1347,10 +1422,14 @@
       }
     \@@_remove_blank:n
       { \fp_use:N \l_@@_punct_removable_width_ratio_fp em }
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
   }
 
 \XeTeXinterchartoks \g_@@_Opening_RightHalf_class \g_@@_non_CJK_Punct_class
   {
+    \@@_remove_blank:n
+      { \l_@@_punct_offset_dim_tl }
     \c_group_end_token
     \@@_nobreak: \skip_horizontal:N \c_zero_skip
   }
@@ -1389,11 +1468,17 @@
     \l_@@_CJK_fontfamily_tl
     \@@_clear_Boundary_to_CJK_interchartoks:
     \@@_set_current_punct_width_ratio:
-    \@@_preprocess_closing_punct:nN { }
+    \@@_preprocess_closing_punct:nN
+      {
+        \@@_remove_blank:n
+          { \l_@@_punct_offset_dim_tl }
+      }
   }
 
 \XeTeXinterchartoks \g_@@_Closing_LeftHalf_class \e@alloc@intercharclass@top
   {
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
     \c_group_end_token
   }
 
@@ -1448,10 +1533,14 @@
         \int_use:N \tex_lastnodetype:D
         _to_Opening_RightHalf:
       }
+    \@@_remove_blank:n
+      { ( \l_@@_punct_offset_dim_tl ) * -1 }
   }
 
 \XeTeXinterchartoks \g_@@_Opening_RightHalf_class \e@alloc@intercharclass@top
   {
+    \@@_remove_blank:n
+      { \l_@@_punct_offset_dim_tl }
     \c_group_end_token
   }
 

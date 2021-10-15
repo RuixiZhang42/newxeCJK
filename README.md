@@ -41,11 +41,12 @@
 
 ### 细节控制
 
-- [x] `\SetPunctWidthRatio{<decimal number>}`
-- [x] `\SetEndSentencePunctWidthRatio{<decimal number>}`
-- [x] `\SetPunctMinWidthRatio{<decimal number>}`
-- [x] `\SetMiddlePunctMinWidthRatio{<decimal number>}`
-- [x] `\SetPunctKernWidthRatio{<decimal number>}`
+- [x] `\SetPunctWidthRatio{<floating point expression>}`
+- [x] `\SetEndSentencePunctWidthRatio{<floating point expression>}`
+- [x] `\SetPunctMinWidthRatio{<floating point expression>}`
+- [x] `\SetMiddlePunctMinWidthRatio{<floating point expression>}`
+- [x] `\SetPunctKernWidthRatio{<floating point expression>}`
+- [x] `\SetPunctOffsetDim{<dimension expression>}`
 - [x] `\SetCJKCondensedRatio{<fraction>}`
 
 ## 效果展示 / Demo
