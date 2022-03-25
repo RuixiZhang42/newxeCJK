@@ -51,24 +51,44 @@
 
 ## 效果展示 / Demo
 
-The text samples in the following demo files were adapted from
-https://zh.wikipedia.org/zh-cn/TeX,
-https://zh.wikipedia.org/zh-tw/TeX,
-and
-https://ja.wikipedia.org/wiki/TeX.
-All original texts were licensed under CC&nbsp;BY&#x2011;SA&nbsp;3.0.
-Modifications and updates were made in order to exhibit typographic adjustments
-when typesetting East Asian languages.
+<details>
+<summary>License notice</summary>
+
+The text samples in the demo files were adapted from:
+
+- https://zh.wikipedia.org/zh-cn/TeX
+- https://zh.wikipedia.org/zh-tw/TeX
+- https://ja.wikipedia.org/wiki/TeX
+- https://dict.revised.moe.edu.tw/
+
+which were licensed under various terms ([details](demo/README.md)).
+Modifications to some of the text were made in order to exhibit
+typographic adjustments when typesetting East Asian languages.
 The demo files themselves (in SVG format) are licensed under
 CC&nbsp;BY&#x2011;SA&nbsp;4.0.
 
-### 本地化
+</details>
 
-<img src="demo/demo-language.svg" alt="demo-language">
+<details>
+<summary>本地化 / Language localization</summary>
 
-### 疏排
+![demo-language](demo/demo-language.svg)
 
-<img src="demo/demo-tracking.svg" alt="demo-tracking">
+</details>
+
+<details>
+<summary>疏排 / Tracking for CJK</summary>
+
+![demo-tracking](demo/demo-tracking.svg)
+
+</details>
+
+<details>
+<summary>标点符号一律半宽 / Half-width CJK punctuation marks</summary>
+
+![demo-halfwidth](demo/demo-halfwidth.svg)
+
+</details>
 
 ## 等待实现的功能 / TODO
 
@@ -81,7 +101,7 @@ The [demo files](demo), which are the non-software parts of this project,
 are licensed under CC&nbsp;BY&#x2011;SA&nbsp;4.0.
 The software parts of this project are licensed under LPPL&nbsp;1.3c.
 
-    Copyright 2020-2021 Ruixi Zhang <ruixizhang42@gmail.com>
+    Copyright 2020-2022 Ruixi Zhang <ruixizhang42@gmail.com>
     
     This work may be distributed and/or modified under the
     conditions of the LaTeX Project Public License, either version 1.3c
