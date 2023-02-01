@@ -77,9 +77,16 @@ CC&nbsp;BY&#x2011;SA&nbsp;4.0.
 </details>
 
 <details>
-<summary>疏排 / Tracking for CJK</summary>
+<summary>疏排、紧排 / Tracking for CJK</summary>
+
+Positive tracking in horizontal typesetting:
 
 ![demo-tracking](demo/demo-tracking.svg)
+
+Negative tracking in vertical typesetting
+(锦华明朝体, &minus;18% tracking):
+
+![demo-tracking-2](demo/demo-tracking-2.svg)
 
 </details>
 
@@ -101,7 +108,7 @@ The [demo files](demo), which are the non-software parts of this project,
 are licensed under CC&nbsp;BY&#x2011;SA&nbsp;4.0.
 The software parts of this project are licensed under LPPL&nbsp;1.3c.
 
-    Copyright 2020-2022 Ruixi Zhang <ruixizhang42@gmail.com>
+    Copyright 2020-2023 Ruixi Zhang <ruixizhang42@gmail.com>
     
     This work may be distributed and/or modified under the
     conditions of the LaTeX Project Public License, either version 1.3c
